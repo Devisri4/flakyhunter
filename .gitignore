@@ -1,0 +1,16 @@
+# Secrets — never commit real values (see .env.example for the names)
+.env
+.env.*
+!.env.example
+
+# Build output
+target/
+node_modules/
+dist/
+
+# Editors / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
