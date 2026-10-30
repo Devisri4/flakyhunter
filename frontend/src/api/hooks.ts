@@ -94,6 +94,79 @@ export function useDeleteProject(slug: string) {
   })
 }
 
+// --- runs & uploads ---
+
+export type RunSummary = {
+  id: number
+  commitSha: string | null
+  branch: string | null
+  ciProvider: string | null
+  buildUrl: string | null
+  triggeredAt: string
+  durationMs: number
+  total: number
+  passed: number
+  failed: number
+  skipped: number
+  flaky: number
+}
+
+export type ResultView = {
+  testCaseId: number
+  suite: string
+  name: string
+  file: string | null
+  outcome: 'PASSED' | 'FAILED' | 'SKIPPED' | 'PASSED_ON_RETRY'
+  attempts: number
+  failedAttempts: number
+  durationMs: number
+  failureType: string | null
+  message: string | null
+  stack: string | null
+}
+
+export type RunDetail = { run: RunSummary; failed: ResultView[]; flaky: ResultView[]; slowest: ResultView[] }
+
+export type Page<T> = { content: T[]; page: number; size: number; totalElements: number }
+
+export type Upload = {
+  jobId: string
+  status: 'QUEUED' | 'PROCESSING' | 'DONE' | 'FAILED'
+  attempts: number
+  error: string | null
+  runId: number | null
+  fileCount: number
+  createdAt: string
+  finishedAt: string | null
+}
+
+export function useRuns(slug: string, page: number, branch: string, size = 20) {
+  const params = new URLSearchParams({ page: String(page), size: String(size) })
+  if (branch) params.set('branch', branch)
+  return useQuery({
+    queryKey: ['runs', slug, page, branch, size],
+    queryFn: () => api<Page<RunSummary>>(`/api/projects/${slug}/runs?${params}`),
+  })
+}
+
+export function useRun(slug: string, id: string) {
+  return useQuery({ queryKey: ['run', slug, id], queryFn: () => api<RunDetail>(`/api/projects/${slug}/runs/${id}`) })
+}
+
+export function useBranches(slug: string) {
+  return useQuery({ queryKey: ['branches', slug], queryFn: () => api<string[]>(`/api/projects/${slug}/branches`) })
+}
+
+/** Recent uploads; polls while any upload is still waiting or being processed. */
+export function useUploads(slug: string) {
+  return useQuery({
+    queryKey: ['uploads', slug],
+    queryFn: () => api<Upload[]>(`/api/projects/${slug}/uploads`),
+    refetchInterval: (query) =>
+      query.state.data?.some((u) => u.status === 'QUEUED' || u.status === 'PROCESSING') ? 3000 : false,
+  })
+}
+
 // --- API keys ---
 
 export function useApiKeys(slug: string) {

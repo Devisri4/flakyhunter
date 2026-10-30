@@ -261,3 +261,83 @@ code.key {
     overflow-x: auto;
   }
 }
+
+/* --- runs --- */
+
+:root {
+  --flaky: #b26a00;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --flaky: #f0a43a;
+  }
+}
+
+.flaky {
+  color: var(--flaky);
+}
+
+.counts {
+  display: inline-flex;
+  gap: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat strong {
+  font-size: 1.6rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.pager {
+  margin-top: 12px;
+}
+
+label.inline {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+details.result {
+  border-bottom: 1px solid var(--border);
+  padding: 8px 0;
+}
+
+details.result summary {
+  cursor: pointer;
+}
+
+pre {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  overflow-x: auto;
+  font-size: 0.82rem;
+  white-space: pre;
+}
+
+.snippet {
+  margin: 12px 0;
+}
+
+.snippet pre {
+  margin-top: 6px;
+}
+
+p.notice.error {
+  color: var(--down);
+}
