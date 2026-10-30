@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: FlakyHunter
+  threads:
+    virtual:
+      enabled: true
+  # Values come from environment variables (see .env.example) — never hard-code them here.
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
+    hikari:
+      maximum-pool-size: 5
+  jpa:
+    open-in-view: false
+
+server:
+  # Render tells the app which port to use through $PORT
+  port: ${PORT:8080}
+
+# Everything the browser calls lives under /api, so the Vercel /api/* rewrite covers it.
+management:
+  endpoints:
+    web:
+      base-path: /api/actuator
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-components: always
