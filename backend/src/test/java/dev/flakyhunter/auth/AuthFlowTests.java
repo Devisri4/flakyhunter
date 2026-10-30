@@ -56,7 +56,8 @@ class AuthFlowTests extends IntegrationTest {
 				.content("""
 						{"email":"%s","password":"short","displayName":"X"}""".formatted(uniqueEmail())))
 				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.status").value(400));
+				.andExpect(jsonPath("$.status").value(400))
+				.andExpect(jsonPath("$.detail").value("password: must be 8 to 72 characters"));
 	}
 
 	@Test
@@ -112,7 +113,7 @@ class AuthFlowTests extends IntegrationTest {
 	void csrfEndpointHandsOutAToken() throws Exception {
 		mvc.perform(get("/api/auth/csrf"))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.headerName").value("X-XSRF-TOKEN"));
+				.andExpect(jsonPath("$.token").isNotEmpty());
 	}
 
 	private org.springframework.test.web.servlet.ResultActions login(String email, String password) throws Exception {
