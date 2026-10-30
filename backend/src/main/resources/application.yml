@@ -13,10 +13,21 @@ spring:
       maximum-pool-size: 5
   jpa:
     open-in-view: false
+    hibernate:
+      ddl-auto: validate   # Flyway owns the schema; Hibernate only checks it matches
 
 server:
   # Render tells the app which port to use through $PORT
   port: ${PORT:8080}
+  # Behind Vercel/Render proxies: trust X-Forwarded-* so the app knows requests were HTTPS
+  forward-headers-strategy: framework
+
+flakyhunter:
+  auth:
+    jwt-secret: ${JWT_SECRET:}
+    access-token-ttl: 15m
+    refresh-token-ttl: 7d
+    secure-cookies: true
 
 # Everything the browser calls lives under /api, so the Vercel /api/* rewrite covers it.
 management:
