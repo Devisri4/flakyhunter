@@ -463,14 +463,22 @@ Each phase ends **deployed, tested and demoable**. Sizes: S ≈ 2–3 evenings, 
 > `package-lock.json` yet, so CI uses `npm install` until one is generated.
 > Live: <https://flakyhunter.vercel.app> → <https://flakyhunter.onrender.com>.
 
-### Phase 1 — Auth, projects, API keys (M)
-- [ ] V1 migration: users, refresh_tokens, projects, project_members, api_keys
-- [ ] Signup/login/refresh/logout/me with cookie JWTs + CSRF; ProblemDetail errors
-- [ ] Projects CRUD, members/roles, `ProjectAccess` + 404-for-non-members
-- [ ] API keys: create (shown once), list, revoke
-- [ ] Frontend: auth pages, project list, create project, settings → API keys
-- [ ] Tests: auth flow, refresh rotation/reuse, cross-project isolation
+### Phase 1 — Auth, projects, API keys (M) ✅ done 2026-10-30
+- [x] V1 migration: users, refresh_tokens, projects, project_members, api_keys
+- [x] Signup/login/refresh/logout/me with cookie JWTs + CSRF; ProblemDetail errors
+- [x] Projects CRUD, members/roles, `ProjectAccess` + 404-for-non-members
+- [x] API keys: create (shown once), list, revoke
+- [x] Frontend: auth pages, project list, create project, settings → API keys
+- [x] Tests: auth flow, refresh rotation/reuse, cross-project isolation
 - **Done when:** a user signs up on the live site, creates a project and gets an API key.
+
+> **Phase 1 notes:** JWTs via Spring Security's OAuth2 resource server (Nimbus, HS256, `JWT_SECRET` on Render),
+> read from the `fh_access` cookie; refresh token in `fh_refresh` (Path `/api/auth`), rotated per family.
+> CSRF uses Spring Security's `csrf().spa()` (`XSRF-TOKEN` cookie → `X-XSRF-TOKEN` header).
+> Emails are stored lower-case with a unique `lower(email)` index instead of `citext`.
+> `ProjectAccess.require(slug, role)` is called at the start of each service method rather than via `@PreAuthorize`.
+> Frontend uses plain CSS for now (Tailwind / react-hook-form / zod can come with the Phase 4 UI).
+> **Still open from the security checklist:** login rate limiting (add with Bucket4j in Phase 2 alongside the ingest limiter).
 
 ### Phase 2 — Ingestion and JUnit XML parsing (M)
 - [ ] V2 migration: ingestion_jobs, test_runs, test_cases, test_results
