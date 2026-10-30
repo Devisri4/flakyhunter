@@ -19,8 +19,12 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler(ApiException.class)
-	ProblemDetail handleApi(ApiException e) {
-		return ProblemDetail.forStatusAndDetail(e.status(), e.getMessage());
+	ResponseEntity<ProblemDetail> handleApi(ApiException e) {
+		ResponseEntity.BodyBuilder response = ResponseEntity.status(e.status());
+		if (e instanceof RateLimiter.RateLimitedException limited) {
+			response.header(HttpHeaders.RETRY_AFTER, String.valueOf(limited.retryAfterSeconds()));
+		}
+		return response.body(ProblemDetail.forStatusAndDetail(e.status(), e.getMessage()));
 	}
 
 	// e.g. two requests creating the same slug at once: the unique index wins

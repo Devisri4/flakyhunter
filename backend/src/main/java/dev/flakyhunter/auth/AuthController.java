@@ -1,10 +1,13 @@
 package dev.flakyhunter.auth;
 
+import java.time.Duration;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
 import dev.flakyhunter.common.ApiException;
 import dev.flakyhunter.common.CurrentUser;
+import dev.flakyhunter.common.RateLimiter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -27,11 +30,13 @@ class AuthController {
 	private final AuthService auth;
 	private final AuthCookies cookies;
 	private final UserRepository users;
+	private final RateLimiter rateLimiter;
 
-	AuthController(AuthService auth, AuthCookies cookies, UserRepository users) {
+	AuthController(AuthService auth, AuthCookies cookies, UserRepository users, RateLimiter rateLimiter) {
 		this.auth = auth;
 		this.cookies = cookies;
 		this.users = users;
+		this.rateLimiter = rateLimiter;
 	}
 
 	record SignupRequest(
@@ -58,12 +63,17 @@ class AuthController {
 	}
 
 	@PostMapping("/signup")
-	ResponseEntity<UserResponse> signup(@Valid @RequestBody SignupRequest body) {
+	ResponseEntity<UserResponse> signup(@Valid @RequestBody SignupRequest body, HttpServletRequest request) {
+		rateLimiter.check("signup:" + request.getRemoteAddr(), rateLimiter.limits().signupPerHour(),
+				Duration.ofHours(1));
 		return withSession(HttpStatus.CREATED, auth.signup(body.email(), body.password(), body.displayName()));
 	}
 
 	@PostMapping("/login")
-	ResponseEntity<UserResponse> login(@Valid @RequestBody LoginRequest body) {
+	ResponseEntity<UserResponse> login(@Valid @RequestBody LoginRequest body, HttpServletRequest request) {
+		// per IP + email: slows down password guessing without letting one IP lock out everyone else
+		rateLimiter.check("login:" + request.getRemoteAddr() + ":" + body.email().strip().toLowerCase(Locale.ROOT),
+				rateLimiter.limits().loginPerMinute(), Duration.ofMinutes(1));
 		return withSession(HttpStatus.OK, auth.login(body.email(), body.password()));
 	}
 

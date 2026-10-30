@@ -23,7 +23,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @Testcontainers(disabledWithoutDocker = true)
 @Import(TestcontainersConfiguration.class)
-@SpringBootTest(properties = "flakyhunter.auth.jwt-secret=test-only-secret-that-is-long-enough-for-hs256")
+@SpringBootTest(properties = {
+		"flakyhunter.auth.jwt-secret=test-only-secret-that-is-long-enough-for-hs256",
+		// every test signs up users from 127.0.0.1
+		"flakyhunter.rate-limits.signup-per-hour=100000",
+		// tests drive the worker themselves, so results don't depend on scheduler timing
+		"flakyhunter.ingestion.worker-enabled=false" })
 @AutoConfigureMockMvc
 public abstract class IntegrationTest {
 

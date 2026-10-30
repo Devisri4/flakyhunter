@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.acme.api.OrderControllerTest" tests="3" skipped="0" failures="1" errors="0" timestamp="2026-10-30T10:00:00" hostname="runner" time="0.84">
+  <properties/>
+  <testcase name="listsOrders()" classname="com.acme.api.OrderControllerTest" time="0.31"/>
+  <testcase name="[1] status=PAID" classname="com.acme.api.OrderControllerTest" time="0.12"/>
+  <testcase name="createsOrder()" classname="com.acme.api.OrderControllerTest" time="0.41">
+    <failure message="java.lang.AssertionError: Status expected:&lt;201&gt; but was:&lt;500&gt;" type="java.lang.AssertionError">java.lang.AssertionError: Status expected:&lt;201&gt; but was:&lt;500&gt;
+	at com.acme.api.OrderControllerTest.createsOrder(OrderControllerTest.java:57)
+</failure>
+  </testcase>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.acme.shop.CheckoutIT" time="9.5" tests="3" errors="0" skipped="0" failures="1" flakes="1">
+  <testcase name="paysWithCard" classname="com.acme.shop.CheckoutIT" time="3.2">
+    <flakyFailure message="Timeout 5000ms exceeded" type="org.openqa.selenium.TimeoutException">
+      <stackTrace><![CDATA[org.openqa.selenium.TimeoutException: Timeout 5000ms exceeded
+	at com.acme.shop.CheckoutIT.paysWithCard(CheckoutIT.java:40)]]></stackTrace>
+      <system-out><![CDATA[attempt 1]]></system-out>
+    </flakyFailure>
+  </testcase>
+  <testcase name="refunds" classname="com.acme.shop.CheckoutIT" time="4.1">
+    <failure message="refund not found" type="java.lang.AssertionError">java.lang.AssertionError: refund not found</failure>
+    <rerunFailure message="refund not found" type="java.lang.AssertionError">java.lang.AssertionError: refund not found</rerunFailure>
+    <rerunFailure message="refund not found" type="java.lang.AssertionError">java.lang.AssertionError: refund not found</rerunFailure>
+  </testcase>
+  <testcase name="showsReceipt" classname="com.acme.shop.CheckoutIT" time="2.2"/>
+</testsuite>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE testsuite [ <!ENTITY secret SYSTEM "file:///etc/passwd"> ]>
+<testsuite name="Evil">
+  <testcase name="leak" classname="Evil"><failure message="&secret;">&secret;</failure></testcase>
+</testsuite>

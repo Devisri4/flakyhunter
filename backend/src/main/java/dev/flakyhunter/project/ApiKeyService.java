@@ -2,6 +2,7 @@ package dev.flakyhunter.project;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import dev.flakyhunter.common.ApiException;
@@ -12,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ApiKeyService {
 
-	static final String KEY_PREFIX = "fh_";
+	public static final String KEY_PREFIX = "fh_";
 	/** How much of the key the UI may show: "fh_" + 8 characters. */
 	static final int VISIBLE_LENGTH = KEY_PREFIX.length() + 8;
 
@@ -60,6 +61,19 @@ public class ApiKeyService {
 				.orElseThrow(() -> ApiException.notFound("API key not found"));
 		key.revoke();
 		apiKeys.save(key);
+	}
+
+	/** Looks up an active key by its hash; the raw key itself is never stored. */
+	@Transactional
+	public Optional<ApiKeyPrincipal> authenticate(String rawKey) {
+		if (!rawKey.startsWith(KEY_PREFIX)) {
+			return Optional.empty();
+		}
+		return apiKeys.findByKeyHashAndRevokedAtIsNull(Tokens.sha256Hex(rawKey)).map(key -> {
+			Instant now = Instant.now();
+			apiKeys.touch(key.getId(), now, now.minusSeconds(60));
+			return new ApiKeyPrincipal(key.getId(), key.getProjectId());
+		});
 	}
 
 	static String newKey() {

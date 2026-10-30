@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="ui">
+    <testsuite name="login page">
+      <testcase name="shows the form" time="0.5"/>
+      <testcase name="shows the form" time="0.7"><failure message="flaky">boom</failure></testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

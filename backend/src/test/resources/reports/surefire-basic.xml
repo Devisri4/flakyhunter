@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="com.acme.shop.CartTest" time="1.234" tests="4" errors="1" skipped="1" failures="1">
+  <properties>
+    <property name="java.version" value="25"/>
+  </properties>
+  <testcase name="addsItem" classname="com.acme.shop.CartTest" time="0.012"/>
+  <testcase name="computesTotal" classname="com.acme.shop.CartTest" time="0.105">
+    <failure message="expected: &lt;42&gt; but was: &lt;41&gt;" type="org.opentest4j.AssertionFailedError"><![CDATA[org.opentest4j.AssertionFailedError: expected: <42> but was: <41>
+	at com.acme.shop.CartTest.computesTotal(CartTest.java:31)
+]]></failure>
+    <system-out><![CDATA[computing total...]]></system-out>
+  </testcase>
+  <testcase name="appliesCoupon" classname="com.acme.shop.CartTest" time="0.003">
+    <skipped message="coupon service not available"/>
+  </testcase>
+  <testcase name="checksOut" classname="com.acme.shop.CartTest" time="1.114">
+    <error message="Connection refused" type="java.net.ConnectException">java.net.ConnectException: Connection refused
+	at com.acme.shop.PaymentClient.pay(PaymentClient.java:88)</error>
+  </testcase>
+</testsuite>

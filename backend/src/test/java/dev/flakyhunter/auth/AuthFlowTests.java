@@ -80,6 +80,18 @@ class AuthFlowTests extends IntegrationTest {
 	}
 
 	@Test
+	void tooManyLoginAttemptsAre429() throws Exception {
+		String email = uniqueEmail();
+		for (int i = 0; i < 10; i++) {
+			login(email, "wrong-password-123").andExpect(status().isUnauthorized());
+		}
+		login(email, "wrong-password-123")
+				.andExpect(status().isTooManyRequests())
+				.andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.header()
+						.exists("Retry-After"));
+	}
+
+	@Test
 	void stateChangingRequestsNeedTheCsrfToken() throws Exception {
 		mvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
 				.content("{\"email\":\"a@b.c\",\"password\":\"whatever1\"}"))

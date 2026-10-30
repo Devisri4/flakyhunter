@@ -10,7 +10,11 @@ spring:
     username: ${DATABASE_USER}
     password: ${DATABASE_PASSWORD}
     hikari:
-      maximum-pool-size: 5
+      maximum-pool-size: 10
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
   jpa:
     open-in-view: false
     hibernate:
@@ -28,6 +32,16 @@ flakyhunter:
     access-token-ttl: 15m
     refresh-token-ttl: 7d
     secure-cookies: true
+  ingestion:
+    poll-interval: 2s
+    batch-size: 3
+    max-attempts: 3
+    stuck-after: 5m
+    max-files: 20
+  rate-limits:
+    login-per-minute: 10
+    signup-per-hour: 20
+    ingest-per-minute: 30
 
 # Everything the browser calls lives under /api, so the Vercel /api/* rewrite covers it.
 management:
