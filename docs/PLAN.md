@@ -480,14 +480,21 @@ Each phase ends **deployed, tested and demoable**. Sizes: S ≈ 2–3 evenings, 
 > Frontend uses plain CSS for now (Tailwind / react-hook-form / zod can come with the Phase 4 UI).
 > **Still open from the security checklist:** login rate limiting (add with Bucket4j in Phase 2 alongside the ingest limiter).
 
-### Phase 2 — Ingestion and JUnit XML parsing (M)
-- [ ] V2 migration: ingestion_jobs, test_runs, test_cases, test_results
-- [ ] `POST /api/v1/ingest` with limits, rate limit, idempotency; job status endpoint
-- [ ] Worker with `SKIP LOCKED`, advisory lock, retries, stuck-job recovery
-- [ ] StAX JUnit parser + fixtures (Surefire incl. reruns, Gradle, pytest, malformed)
-- [ ] Runs list/detail pages; Setup page with curl snippet
-- [ ] Tests: parser fixtures, idempotency concurrency test, end-to-end ingest integration test
+### Phase 2 — Ingestion and JUnit XML parsing (M) ✅ done 2026-10-30
+- [x] V2 migration: ingestion_jobs, test_runs, test_cases, test_results
+- [x] `POST /api/v1/ingest` with limits, rate limit, idempotency; job status endpoint
+- [x] Worker with `SKIP LOCKED`, advisory lock, retries, stuck-job recovery
+- [x] StAX JUnit parser + fixtures (Surefire incl. reruns, Gradle, pytest, malformed)
+- [x] Runs list/detail pages; Setup page with curl snippet
+- [x] Tests: parser fixtures, idempotency concurrency test, end-to-end ingest integration test
 - **Done when:** `curl` uploads a real Surefire report and the run appears on the dashboard.
+
+> **Phase 2 notes:** Uploaded files live in a separate `ingestion_job_files` table (gzip `bytea`, deleted after
+> processing) instead of one `payload` column, and run metadata are plain columns on `ingestion_jobs` instead of
+> `jsonb`. `test_results` also stores `failure_type` (exception class) for Phase 3 signatures. CI endpoints use their
+> own Spring Security filter chain (`X-Api-Key`, no cookies, no CSRF). Bucket4j + Caffeine rate limits: login
+> 10/min per IP+email, signup 20/h per IP, ingest 30/min per key — so the Phase 1 open item is closed.
+> Tests drive the worker directly (`worker-enabled=false`) so they don't depend on scheduler timing.
 
 ### Phase 3 — Flakiness engine and signatures (M)
 - [ ] V3 migration: stats columns, state_changes, failure_signatures, daily_stats
