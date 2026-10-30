@@ -13,8 +13,15 @@ export default function App() {
 
   return (
     <main>
-      <h1>🐞 FlakyHunter</h1>
-      <p>Finds flaky tests in your CI runs.</p>
+      <header className="brand">
+        <img src="/logo.svg" alt="" width={48} height={48} />
+        <div>
+          <h1>
+            Flaky<span className="accent">Hunter</span>
+          </h1>
+          <p>Finds flaky tests in your CI runs.</p>
+        </div>
+      </header>
       <section className="card">
         <h2>Backend status</h2>
         {error && <p className="down">Could not reach the API: {error}</p>}

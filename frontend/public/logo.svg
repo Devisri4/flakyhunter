@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="FlakyHunter logo">
+  <defs>
+    <linearGradient id="fh-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7c3aed"/>
+      <stop offset="1" stop-color="#db2777"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#fh-bg)"/>
+  <!-- magnifying glass = hunting -->
+  <circle cx="28" cy="28" r="15" fill="none" stroke="#fff" stroke-width="5"/>
+  <line x1="39.5" y1="39.5" x2="51" y2="51" stroke="#fff" stroke-width="6.5" stroke-linecap="round"/>
+  <!-- zig-zag pass/fail signal = flaky -->
+  <polyline points="17,29 21,29 24.5,21 29,36 32.5,24.5 35,29 39,29" fill="none" stroke="#fff"
+            stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
