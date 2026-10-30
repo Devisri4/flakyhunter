@@ -6,6 +6,9 @@ groups failures by root cause, and lets teams quarantine bad tests so they stop 
 
 > 🚧 Work in progress — see [docs/PLAN.md](docs/PLAN.md) for the full plan and progress.
 
+**Live:** <https://flakyhunter.vercel.app> · API health: <https://flakyhunter.vercel.app/api/actuator/health>
+(the free backend sleeps when idle — the first visit can take about a minute)
+
 ## Tech stack
 
 - **Backend:** Java 25, Spring Boot 4, PostgreSQL (Neon), Flyway — hosted on Render

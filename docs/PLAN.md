@@ -447,15 +447,21 @@ so `mvn test` still runs unit tests locally, and **GitHub Actions runs everythin
 
 Each phase ends **deployed, tested and demoable**. Sizes: S ≈ 2–3 evenings, M ≈ 1 week part-time, L ≈ 2 weeks part-time.
 
-### Phase 0 — Environment and skeleton (S)
-- [ ] Laptop checks: `java -version` (25), `mvn -v`, Maven Central reachable (download one dependency),
+### Phase 0 — Environment and skeleton (S) ✅ done 2026-10-30
+- [x] Laptop checks: `java -version` (25), `mvn -v`, Maven Central reachable (download one dependency),
       Postgres port 5432 to Neon reachable (risk R2), Vercel + Render accounts
-- [ ] Scaffold backend at start.spring.io (Web, Security, JPA, Validation, Actuator, Flyway, PostgreSQL, Testcontainers);
+- [x] Scaffold backend at start.spring.io (Web, Security, JPA, Validation, Actuator, Flyway, PostgreSQL, Testcontainers);
       scaffold frontend (Vite React TS) via StackBlitz
-- [ ] Monorepo on GitHub, ADR-0001…0005 written, `.env.example`, README skeleton
-- [ ] CI: backend + frontend workflows green
-- [ ] Deploy "hello" API to Render and SPA to Vercel with the `/api` rewrite working end-to-end
+- [x] Monorepo on GitHub, ADR-0001…0005 written, `.env.example`, README skeleton
+- [x] CI: backend + frontend workflows green
+- [x] Deploy "hello" API to Render and SPA to Vercel with the `/api` rewrite working end-to-end
 - **Done when:** the deployed SPA shows the API's `/actuator/health` status through the proxy.
+
+> **Phase 0 notes:** Spring Boot **4.1.2**. Neon and Render both in **US East (Ohio)**. Actuator lives at
+> **`/api/actuator/*`** (so the single `/api/*` Vercel rewrite covers it; keep-alive/E2E use that path).
+> Frontend files were written by hand (no Node on the laptop, StackBlitz not needed); there is no
+> `package-lock.json` yet, so CI uses `npm install` until one is generated.
+> Live: <https://flakyhunter.vercel.app> → <https://flakyhunter.onrender.com>.
 
 ### Phase 1 — Auth, projects, API keys (M)
 - [ ] V1 migration: users, refresh_tokens, projects, project_members, api_keys
