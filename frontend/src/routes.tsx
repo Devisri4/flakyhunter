@@ -8,6 +8,8 @@ import { SettingsPage } from './features/projects/SettingsPage'
 import { RunsPage } from './features/runs/RunsPage'
 import { RunDetailPage } from './features/runs/RunDetailPage'
 import { SetupPage } from './features/setup/SetupPage'
+import { TestsPage } from './features/tests/TestsPage'
+import { SignaturesPage } from './features/tests/SignaturesPage'
 
 export const router = createBrowserRouter([
   {
@@ -25,6 +27,8 @@ export const router = createBrowserRouter([
           { path: '/p/:slug/runs', element: <RunsPage /> },
           { path: '/p/:slug/runs/:id', element: <RunDetailPage /> },
           { path: '/p/:slug/setup', element: <SetupPage /> },
+          { path: '/p/:slug/tests', element: <TestsPage /> },
+          { path: '/p/:slug/signatures', element: <SignaturesPage /> },
         ],
       },
       { path: '*', element: <p className="muted">Page not found.</p> },

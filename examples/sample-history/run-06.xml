@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="com.acme.shop.CartTest">
+    <testcase classname="com.acme.shop.CartTest" name="addsItem" time="0.490"/>
+    <testcase classname="com.acme.shop.CartTest" name="appliesCoupon" time="0.349"/>
+    <testcase classname="com.acme.shop.CartTest" name="computesTotal" time="0.449"/>
+    <testcase classname="com.acme.shop.CartTest" name="removesItem" time="0.678"/>
+  </testsuite>
+  <testsuite name="com.acme.shop.CheckoutIT">
+    <testcase classname="com.acme.shop.CheckoutIT" name="paysWithCard" time="0.205"><flakyFailure message="Timeout 4250ms exceeded waiting for &quot;#btn-5&quot;" type="org.openqa.selenium.TimeoutException"><stackTrace>org.openqa.selenium.TimeoutException: Timeout&#10;	at com.acme.shop.pages.CheckoutPage.pay(Page.java:45)</stackTrace></flakyFailure></testcase>
+    <testcase classname="com.acme.shop.CheckoutIT" name="refunds" time="0.935"/>
+    <testcase classname="com.acme.shop.CheckoutIT" name="showsReceipt" time="0.418"/>
+  </testsuite>
+  <testsuite name="com.acme.shop.SearchTest">
+    <testcase classname="com.acme.shop.SearchTest" name="exportsCsv" time="0.786"><skipped message="exports are disabled"/></testcase>
+    <testcase classname="com.acme.shop.SearchTest" name="filtersByBrand" time="0.545"/>
+    <testcase classname="com.acme.shop.SearchTest" name="findsByName" time="0.588"/>
+    <testcase classname="com.acme.shop.SearchTest" name="sortsByPrice" time="0.231"/>
+  </testsuite>
+</testsuites>

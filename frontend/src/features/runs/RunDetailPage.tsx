@@ -2,6 +2,7 @@ import { Link, useParams } from 'react-router'
 import { useRun, type ResultView } from '../../api/hooks'
 import { formatDateTime, formatDuration, passRate, shortSha } from '../../lib/format'
 import { RunCounts } from './RunsTable'
+import { StateBadge } from '../../components/TestBadges'
 
 export function RunDetailPage() {
   const { slug = '', id = '' } = useParams()
@@ -97,7 +98,7 @@ function ResultsSection(props: { title: string; empty: string; results: ResultVi
         <details key={r.testCaseId} className="result">
           <summary>
             <span className={props.tone}>{props.tone === 'down' ? '✗' : '↻'}</span>{' '}
-            <span className="muted">{r.suite} ›</span> <strong>{r.name}</strong>
+            <span className="muted">{r.suite} ›</span> <strong>{r.name}</strong> <StateBadge state={r.state} />
             {r.attempts > 1 && (
               <span className="badge">
                 {r.failedAttempts}/{r.attempts} attempts failed

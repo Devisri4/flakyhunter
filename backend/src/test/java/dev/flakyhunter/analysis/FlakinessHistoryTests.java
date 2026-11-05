@@ -119,14 +119,15 @@ class FlakinessHistoryTests extends IntegrationTest {
 
 	@Test
 	void sameRootCauseIsOneSignature() throws Exception {
-		// the flaky test's 4 failures (2 fails + 2 failed attempts before a retry) differ only in numbers and
-		// selectors, so they form one signature; the broken test's 3 failures form another
+		// the timeouts differ only in numbers and selectors, so they form one signature: flakyCheckout's 3 fails
+		// + 2 failed attempts before a retry, plus retriedOnce's failed attempt => 6 failures in 2 tests.
+		// The broken test's 3 assertion failures form another.
 		mvc.perform(get("/api/projects/" + slug + "/signatures").cookie(owner))
 				.andExpect(jsonPath("$.totalElements").value(2))
 				.andExpect(jsonPath("$.content[0].exceptionType").value("org.openqa.selenium.TimeoutException"))
 				.andExpect(jsonPath("$.content[0].normalizedMessage").value("Timeout <dur> exceeded waiting for <str>"))
-				.andExpect(jsonPath("$.content[0].occurrences").value(4))
-				.andExpect(jsonPath("$.content[0].affectedTests").value(1))
+				.andExpect(jsonPath("$.content[0].occurrences").value(6))
+				.andExpect(jsonPath("$.content[0].affectedTests").value(2))
 				.andExpect(jsonPath("$.content[1].occurrences").value(3));
 	}
 

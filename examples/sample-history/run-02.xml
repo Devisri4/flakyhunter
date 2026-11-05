@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="com.acme.shop.CartTest">
+    <testcase classname="com.acme.shop.CartTest" name="addsItem" time="0.648"/>
+    <testcase classname="com.acme.shop.CartTest" name="appliesCoupon" time="0.734"><failure message="Timeout 3250ms exceeded waiting for &quot;#btn-1&quot;" type="org.openqa.selenium.TimeoutException">org.openqa.selenium.TimeoutException: Timeout&#10;	at com.acme.shop.pages.CheckoutPage.pay(Page.java:41)</failure></testcase>
+    <testcase classname="com.acme.shop.CartTest" name="computesTotal" time="0.544"/>
+    <testcase classname="com.acme.shop.CartTest" name="removesItem" time="0.678"/>
+  </testsuite>
+  <testsuite name="com.acme.shop.CheckoutIT">
+    <testcase classname="com.acme.shop.CheckoutIT" name="paysWithCard" time="0.355"/>
+    <testcase classname="com.acme.shop.CheckoutIT" name="refunds" time="0.142"/>
+    <testcase classname="com.acme.shop.CheckoutIT" name="showsReceipt" time="0.335"/>
+  </testsuite>
+  <testsuite name="com.acme.shop.SearchTest">
+    <testcase classname="com.acme.shop.SearchTest" name="exportsCsv" time="0.227"><skipped message="exports are disabled"/></testcase>
+    <testcase classname="com.acme.shop.SearchTest" name="filtersByBrand" time="0.402"><failure message="Timeout 3250ms exceeded waiting for &quot;#btn-1&quot;" type="org.openqa.selenium.TimeoutException">org.openqa.selenium.TimeoutException: Timeout&#10;	at com.acme.shop.pages.SearchPage.filter(Page.java:41)</failure></testcase>
+    <testcase classname="com.acme.shop.SearchTest" name="findsByName" time="0.678"/>
+    <testcase classname="com.acme.shop.SearchTest" name="sortsByPrice" time="0.625"/>
+  </testsuite>
+</testsuites>

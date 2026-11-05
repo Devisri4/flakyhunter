@@ -1,7 +1,58 @@
 import { Link, useParams } from 'react-router'
-import { useProject, useRuns, useUploads } from '../../api/hooks'
+import { useProject, useRuns, useTests, useTestSummary, useUploads, type TestState } from '../../api/hooks'
+import { OutcomeStrip, StateBadge, STATE_INFO } from '../../components/TestBadges'
 import { formatDateTime } from '../../lib/format'
 import { RunsTable } from '../runs/RunsTable'
+
+const HEALTH_ORDER: TestState[] = ['FLAKY', 'BROKEN', 'SUSPECT', 'STABLE', 'NEW']
+
+/** Counts per state (each links to the filtered test list) and the most flaky tests. */
+function TestHealth({ slug }: { slug: string }) {
+  const summary = useTestSummary(slug)
+  const flaky = useTests(slug, { state: 'FLAKY', size: 5 })
+  if (!summary.data) return null
+  const total = Object.values(summary.data).reduce((a, b) => a + b, 0)
+  if (total === 0) return null
+
+  return (
+    <section className="card">
+      <h2>Test health</h2>
+      <div className="stats">
+        {HEALTH_ORDER.map((s) => (
+          <Link key={s} to={`/p/${slug}/tests?state=${s}`} className={`stat stat-link state-${s.toLowerCase()}`}>
+            <span className="muted">
+              {STATE_INFO[s].icon} {STATE_INFO[s].label}
+            </span>
+            <strong>{summary.data[s]}</strong>
+          </Link>
+        ))}
+      </div>
+      {flaky.data && flaky.data.content.length > 0 && (
+        <>
+          <h3>Most flaky</h3>
+          <table>
+            <tbody>
+              {flaky.data.content.map((t) => (
+                <tr key={t.id}>
+                  <td>
+                    <span className="muted">{t.suite} ›</span> {t.name}
+                  </td>
+                  <td>
+                    <StateBadge state={t.state} />
+                  </td>
+                  <td>{Number(t.score).toFixed(2)}</td>
+                  <td>
+                    <OutcomeStrip outcomes={t.windowOutcomes} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+    </section>
+  )
+}
 
 export function ProjectPage() {
   const { slug = '' } = useParams()
@@ -20,8 +71,14 @@ export function ProjectPage() {
       <div className="row spread">
         <h1>{p.name}</h1>
         <div className="row">
+          <Link to={`/p/${slug}/tests`} className="button ghost">
+            Tests
+          </Link>
           <Link to={`/p/${slug}/runs`} className="button ghost">
             Runs
+          </Link>
+          <Link to={`/p/${slug}/signatures`} className="button ghost">
+            Failures
           </Link>
           <Link to={`/p/${slug}/setup`} className="button ghost">
             Setup
@@ -44,6 +101,8 @@ export function ProjectPage() {
           ⚠ Upload from {formatDateTime(u.createdAt)} failed: {u.error}
         </p>
       ))}
+
+      <TestHealth slug={slug} />
 
       <section className="card">
         <div className="row spread">

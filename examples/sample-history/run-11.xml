@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="com.acme.shop.CartTest">
+    <testcase classname="com.acme.shop.CartTest" name="addsItem" time="0.228"/>
+    <testcase classname="com.acme.shop.CartTest" name="appliesCoupon" time="0.432"/>
+    <testcase classname="com.acme.shop.CartTest" name="computesTotal" time="0.973"/>
+    <testcase classname="com.acme.shop.CartTest" name="removesItem" time="0.213"/>
+  </testsuite>
+  <testsuite name="com.acme.shop.CheckoutIT">
+    <testcase classname="com.acme.shop.CheckoutIT" name="paysWithCard" time="0.615"><flakyFailure message="Timeout 5500ms exceeded waiting for &quot;#btn-10&quot;" type="org.openqa.selenium.TimeoutException"><stackTrace>org.openqa.selenium.TimeoutException: Timeout&#10;	at com.acme.shop.pages.CheckoutPage.pay(Page.java:50)</stackTrace></flakyFailure></testcase>
+    <testcase classname="com.acme.shop.CheckoutIT" name="refunds" time="0.586"><failure message="expected: &lt;110&gt; but was: &lt;0&gt;" type="java.lang.AssertionError">java.lang.AssertionError: refund missing&#10;	at com.acme.shop.Refunds.check(Refunds.java:30)</failure></testcase>
+    <testcase classname="com.acme.shop.CheckoutIT" name="showsReceipt" time="0.644"/>
+  </testsuite>
+  <testsuite name="com.acme.shop.SearchTest">
+    <testcase classname="com.acme.shop.SearchTest" name="exportsCsv" time="0.307"><skipped message="exports are disabled"/></testcase>
+    <testcase classname="com.acme.shop.SearchTest" name="filtersByBrand" time="0.207"/>
+    <testcase classname="com.acme.shop.SearchTest" name="findsByName" time="0.626"/>
+    <testcase classname="com.acme.shop.SearchTest" name="sortsByPrice" time="0.863"/>
+    <testcase classname="com.acme.shop.SearchTest" name="suggestsSpelling" time="0.784"/>
+  </testsuite>
+</testsuites>

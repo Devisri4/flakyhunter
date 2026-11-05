@@ -341,3 +341,91 @@ pre {
 p.notice.error {
   color: var(--down);
 }
+
+/* --- test states (colour + icon + word, never colour alone) --- */
+
+:root {
+  --state-flaky: #b26a00;
+  --state-broken: #c62828;
+  --state-suspect: #7a5af5;
+  --state-stable: #1a7f37;
+  --state-new: #6b6b76;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --state-flaky: #f0a43a;
+    --state-broken: #ff6b6b;
+    --state-suspect: #a78bfa;
+    --state-stable: #4ac26b;
+    --state-new: #9a9aa6;
+  }
+}
+
+.state {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  white-space: nowrap;
+}
+
+.state-flaky { color: var(--state-flaky); }
+.state-broken { color: var(--state-broken); }
+.state-suspect { color: var(--state-suspect); }
+.state-stable { color: var(--state-stable); }
+.state-new { color: var(--state-new); }
+
+.stat-link {
+  text-decoration: none;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.stat-link strong {
+  color: var(--text);
+}
+
+.strip {
+  display: inline-flex;
+  gap: 2px;
+  vertical-align: middle;
+}
+
+.cell {
+  width: 8px;
+  height: 14px;
+  border-radius: 2px;
+}
+
+.cell-P { background: var(--state-stable); }
+.cell-F { background: var(--state-broken); }
+.cell-R { background: var(--state-flaky); }
+
+.chips {
+  margin-bottom: 12px;
+}
+
+.chip {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.chip.active {
+  border-color: var(--primary);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.small {
+  font-size: 0.85rem;
+}

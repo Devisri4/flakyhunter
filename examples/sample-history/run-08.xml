@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="com.acme.shop.CartTest">
+    <testcase classname="com.acme.shop.CartTest" name="addsItem" time="0.402"/>
+    <testcase classname="com.acme.shop.CartTest" name="appliesCoupon" time="0.278"><failure message="Timeout 4750ms exceeded waiting for &quot;#btn-7&quot;" type="org.openqa.selenium.TimeoutException">org.openqa.selenium.TimeoutException: Timeout&#10;	at com.acme.shop.pages.CheckoutPage.pay(Page.java:47)</failure></testcase>
+    <testcase classname="com.acme.shop.CartTest" name="computesTotal" time="0.456"/>
+    <testcase classname="com.acme.shop.CartTest" name="removesItem" time="0.782"/>
+  </testsuite>
+  <testsuite name="com.acme.shop.CheckoutIT">
+    <testcase classname="com.acme.shop.CheckoutIT" name="paysWithCard" time="0.114"><failure message="Timeout 4750ms exceeded waiting for &quot;#btn-7&quot;" type="org.openqa.selenium.TimeoutException">org.openqa.selenium.TimeoutException: Timeout&#10;	at com.acme.shop.pages.CheckoutPage.pay(Page.java:47)</failure></testcase>
+    <testcase classname="com.acme.shop.CheckoutIT" name="refunds" time="0.863"/>
+    <testcase classname="com.acme.shop.CheckoutIT" name="showsReceipt" time="0.205"/>
+  </testsuite>
+  <testsuite name="com.acme.shop.SearchTest">
+    <testcase classname="com.acme.shop.SearchTest" name="exportsCsv" time="0.325"><skipped message="exports are disabled"/></testcase>
+    <testcase classname="com.acme.shop.SearchTest" name="filtersByBrand" time="0.661"/>
+    <testcase classname="com.acme.shop.SearchTest" name="findsByName" time="0.844"/>
+    <testcase classname="com.acme.shop.SearchTest" name="sortsByPrice" time="0.282"/>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="com.acme.shop.CartTest">
+    <testcase classname="com.acme.shop.CartTest" name="addsItem" time="0.661"/>
+    <testcase classname="com.acme.shop.CartTest" name="appliesCoupon" time="0.468"/>
+    <testcase classname="com.acme.shop.CartTest" name="computesTotal" time="0.906"/>
+    <testcase classname="com.acme.shop.CartTest" name="removesItem" time="0.640"/>
+  </testsuite>
+  <testsuite name="com.acme.shop.CheckoutIT">
+    <testcase classname="com.acme.shop.CheckoutIT" name="paysWithCard" time="0.786"/>
+    <testcase classname="com.acme.shop.CheckoutIT" name="refunds" time="0.169"/>
+    <testcase classname="com.acme.shop.CheckoutIT" name="showsReceipt" time="0.219"/>
+  </testsuite>
+  <testsuite name="com.acme.shop.SearchTest">
+    <testcase classname="com.acme.shop.SearchTest" name="exportsCsv" time="0.573"><skipped message="exports are disabled"/></testcase>
+    <testcase classname="com.acme.shop.SearchTest" name="filtersByBrand" time="0.430"/>
+    <testcase classname="com.acme.shop.SearchTest" name="findsByName" time="0.412"/>
+    <testcase classname="com.acme.shop.SearchTest" name="sortsByPrice" time="0.946"/>
+  </testsuite>
+</testsuites>

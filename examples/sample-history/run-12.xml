@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="com.acme.shop.CartTest">
+    <testcase classname="com.acme.shop.CartTest" name="addsItem" time="0.822"/>
+    <testcase classname="com.acme.shop.CartTest" name="appliesCoupon" time="0.803"/>
+    <testcase classname="com.acme.shop.CartTest" name="computesTotal" time="0.346"/>
+    <testcase classname="com.acme.shop.CartTest" name="removesItem" time="0.190"/>
+  </testsuite>
+  <testsuite name="com.acme.shop.CheckoutIT">
+    <testcase classname="com.acme.shop.CheckoutIT" name="paysWithCard" time="0.604"/>
+    <testcase classname="com.acme.shop.CheckoutIT" name="refunds" time="0.379"><failure message="expected: &lt;111&gt; but was: &lt;0&gt;" type="java.lang.AssertionError">java.lang.AssertionError: refund missing&#10;	at com.acme.shop.Refunds.check(Refunds.java:31)</failure></testcase>
+    <testcase classname="com.acme.shop.CheckoutIT" name="showsReceipt" time="0.365"/>
+  </testsuite>
+  <testsuite name="com.acme.shop.SearchTest">
+    <testcase classname="com.acme.shop.SearchTest" name="exportsCsv" time="0.229"><skipped message="exports are disabled"/></testcase>
+    <testcase classname="com.acme.shop.SearchTest" name="filtersByBrand" time="0.803"><failure message="Timeout 5750ms exceeded waiting for &quot;#btn-11&quot;" type="org.openqa.selenium.TimeoutException">org.openqa.selenium.TimeoutException: Timeout&#10;	at com.acme.shop.pages.SearchPage.filter(Page.java:51)</failure></testcase>
+    <testcase classname="com.acme.shop.SearchTest" name="findsByName" time="0.973"><flakyFailure message="Timeout 5750ms exceeded waiting for &quot;#btn-11&quot;" type="org.openqa.selenium.TimeoutException"><stackTrace>org.openqa.selenium.TimeoutException: Timeout&#10;	at com.acme.shop.pages.SearchPage.filter(Page.java:51)</stackTrace></flakyFailure></testcase>
+    <testcase classname="com.acme.shop.SearchTest" name="sortsByPrice" time="0.630"/>
+    <testcase classname="com.acme.shop.SearchTest" name="suggestsSpelling" time="0.557"/>
+  </testsuite>
+</testsuites>

@@ -123,9 +123,39 @@ export type ResultView = {
   failureType: string | null
   message: string | null
   stack: string | null
+  state: TestState
+  signatureId: number | null
 }
 
 export type RunDetail = { run: RunSummary; failed: ResultView[]; flaky: ResultView[]; slowest: ResultView[] }
+
+export type TestState = 'NEW' | 'STABLE' | 'SUSPECT' | 'FLAKY' | 'BROKEN'
+
+export type TestCase = {
+  id: number
+  suite: string
+  name: string
+  file: string | null
+  state: TestState
+  score: number
+  windowOutcomes: string
+  runsInWindow: number
+  flipCount: number
+  retryPassCount: number
+  failStreak: number
+  lastSeen: string
+}
+
+export type Signature = {
+  id: number
+  exceptionType: string
+  normalizedMessage: string
+  sampleStack: string | null
+  occurrences: number
+  affectedTests: number
+  firstSeen: string
+  lastSeen: string
+}
 
 export type Page<T> = { content: T[]; page: number; size: number; totalElements: number }
 
@@ -164,6 +194,39 @@ export function useUploads(slug: string) {
     queryFn: () => api<Upload[]>(`/api/projects/${slug}/uploads`),
     refetchInterval: (query) =>
       query.state.data?.some((u) => u.status === 'QUEUED' || u.status === 'PROCESSING') ? 3000 : false,
+  })
+}
+
+// --- tests & signatures ---
+
+export function useTests(
+  slug: string,
+  opts: { state?: TestState | ''; q?: string; sort?: string; page?: number; size?: number },
+) {
+  const params = new URLSearchParams({
+    page: String(opts.page ?? 0),
+    size: String(opts.size ?? 25),
+    sort: opts.sort ?? 'score',
+  })
+  if (opts.state) params.set('state', opts.state)
+  if (opts.q) params.set('q', opts.q)
+  return useQuery({
+    queryKey: ['tests', slug, params.toString()],
+    queryFn: () => api<Page<TestCase>>(`/api/projects/${slug}/tests?${params}`),
+  })
+}
+
+export function useTestSummary(slug: string) {
+  return useQuery({
+    queryKey: ['tests-summary', slug],
+    queryFn: () => api<Record<TestState, number>>(`/api/projects/${slug}/tests/summary`),
+  })
+}
+
+export function useSignatures(slug: string, page: number) {
+  return useQuery({
+    queryKey: ['signatures', slug, page],
+    queryFn: () => api<Page<Signature>>(`/api/projects/${slug}/signatures?page=${page}`),
   })
 }
 
