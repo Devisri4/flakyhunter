@@ -51,7 +51,7 @@ test.describe('accounts', () => {
   test('a wrong password shows a friendly error', async ({ page }) => {
     await page.goto('/login')
     await page.getByLabel('Email').fill(`nobody-${Date.now()}@example.com`)
-    await page.getByLabel('Password').fill('definitely-wrong')
+    await page.getByLabel('Password', { exact: true }).fill('definitely-wrong')
     await page.getByRole('button', { name: 'Log in' }).click()
     await expect(page.getByText('Invalid email or password')).toBeVisible()
   })

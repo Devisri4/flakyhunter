@@ -11,7 +11,7 @@ test.describe('quarantine round trip', () => {
   test('quarantine a test, see the badge, lift it again', async ({ page }) => {
     await page.goto('/login')
     await page.getByLabel('Email').fill(E2E_EMAIL)
-    await page.getByLabel('Password').fill(E2E_PASSWORD)
+    await page.getByLabel('Password', { exact: true }).fill(E2E_PASSWORD)
     await page.getByRole('button', { name: 'Log in' }).click()
     await expect(page).toHaveURL(/\/projects$/)
 
