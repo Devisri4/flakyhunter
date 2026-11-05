@@ -29,13 +29,11 @@ class AuthController {
 
 	private final AuthService auth;
 	private final AuthCookies cookies;
-	private final UserRepository users;
 	private final RateLimiter rateLimiter;
 
-	AuthController(AuthService auth, AuthCookies cookies, UserRepository users, RateLimiter rateLimiter) {
+	AuthController(AuthService auth, AuthCookies cookies, RateLimiter rateLimiter) {
 		this.auth = auth;
 		this.cookies = cookies;
-		this.users = users;
 		this.rateLimiter = rateLimiter;
 	}
 
@@ -107,9 +105,7 @@ class AuthController {
 
 	@GetMapping("/me")
 	UserResponse me() {
-		return users.findById(CurrentUser.id())
-				.map(UserResponse::of)
-				.orElseThrow(() -> ApiException.unauthorized("Login required"));
+		return UserResponse.of(auth.currentUser(CurrentUser.id()));
 	}
 
 	private ResponseEntity<UserResponse> withSession(HttpStatus status, AuthService.Session session) {

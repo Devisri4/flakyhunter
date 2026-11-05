@@ -48,6 +48,15 @@ flakyhunter:
     # the public read-only demo project at /p/demo (generated on startup, topped up daily)
     enabled: ${DEMO_MODE:true}
 
+# API documentation under /api (so the Vercel proxy serves it): Swagger UI at /api/docs
+springdoc:
+  api-docs:
+    path: /api/docs/openapi
+  swagger-ui:
+    path: /api/docs
+    operations-sorter: alpha
+    tags-sorter: alpha
+
 # /api/actuator/info: build version/time, plus the deployed commit (Render sets RENDER_GIT_COMMIT)
 info:
   deploy:

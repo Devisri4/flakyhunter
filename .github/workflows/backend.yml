@@ -3,7 +3,7 @@ name: backend
 on:
   push:
     branches: [main]
-    paths: ['backend/**', '.github/workflows/backend.yml']
+    paths: ['backend/**', '.github/workflows/backend.yml', 'github-action/**']
   pull_request:
     paths: ['backend/**', '.github/workflows/backend.yml']
   workflow_dispatch:
@@ -21,5 +21,29 @@ jobs:
           distribution: temurin
           java-version: '25'
           cache: maven
-      # Docker is available here, so the Testcontainers tests really run.
+      # Docker is available here, so the Testcontainers tests really run. JaCoCo writes the coverage report.
       - run: ./mvnw -B verify
+
+      - name: Coverage summary
+        if: always()
+        run: |
+          csv=target/site/jacoco/jacoco.csv
+          [ -f "$csv" ] || exit 0
+          awk -F, 'NR>1 { missed += $8; covered += $9 } END { printf "### Line coverage: %.1f%%\n", 100 * covered / (missed + covered) }' "$csv" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Keep the coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: backend/target/site/jacoco
+          if-no-files-found: ignore
+
+      # Dogfooding: FlakyHunter tracks its own tests. Needs the repository secret FLAKYHUNTER_API_KEY;
+      # without it the step only prints a warning.
+      - name: Upload test results to FlakyHunter
+        if: always()
+        uses: ./github-action
+        with:
+          api-key: ${{ secrets.FLAKYHUNTER_API_KEY }}
+          files: backend/target/surefire-reports/TEST-*.xml

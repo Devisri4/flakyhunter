@@ -40,12 +40,13 @@ class TestController {
 	@GetMapping("/tests")
 	RunQueries.Page<TestQueries.TestCaseView> list(@PathVariable String slug,
 			@RequestParam(required = false) TestState state,
+			@RequestParam(required = false) Boolean quarantined,
 			@RequestParam(required = false) String q,
 			@RequestParam(defaultValue = "score") String sort,
 			@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "25") int size) {
 		var project = access.require(slug, Role.VIEWER).project();
-		return tests.list(project.getId(), state, q, sort, Math.max(0, page), Math.clamp(size, 1, 100));
+		return tests.list(project.getId(), state, quarantined, q, sort, Math.max(0, page), Math.clamp(size, 1, 100));
 	}
 
 	@GetMapping("/tests/summary")

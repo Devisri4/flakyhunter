@@ -2,6 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     { "source": "/api/:path*", "destination": "https://flakyhunter.onrender.com/api/:path*" },
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    { "source": "/swagger-ui/:path*", "destination": "https://flakyhunter.onrender.com/swagger-ui/:path*" },
+    { "source": "/((?!api/|swagger-ui/).*)", "destination": "/index.html" }
   ]
 }

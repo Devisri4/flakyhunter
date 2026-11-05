@@ -14,8 +14,10 @@ export function TestsPage() {
   const q = params.get('q') ?? ''
   const sort = params.get('sort') ?? 'score'
   const page = Number(params.get('page') ?? 0)
+  const quarantinedParam = params.get('quarantined')
+  const quarantined = quarantinedParam === null ? undefined : quarantinedParam === 'true'
   const [search, setSearch] = useState(q)
-  const tests = useTests(slug, { state, q, sort, page, size: PAGE_SIZE })
+  const tests = useTests(slug, { state, quarantined, q, sort, page, size: PAGE_SIZE })
   const totalPages = tests.data ? Math.max(1, Math.ceil(tests.data.totalElements / PAGE_SIZE)) : 1
 
   function update(changes) {
@@ -46,6 +48,13 @@ export function TestsPage() {
             {STATE_INFO[s].icon} {STATE_INFO[s].label}
           </button>
         ))}
+        <button
+          className={`chip ${quarantined === true ? 'active' : ''}`}
+          aria-pressed={quarantined === true}
+          onClick={() => update({ quarantined: quarantined === true ? '' : 'true' })}
+        >
+          🧊 Quarantined
+        </button>
       </div>
 
       <form className="row" onSubmit={submit}>
@@ -85,6 +94,11 @@ export function TestsPage() {
                   </td>
                   <td>
                     <StateBadge state={t.state} />
+                    {t.quarantined && (
+                      <span className="state state-quarantined" title="Quarantined: CI skips it">
+                        🧊
+                      </span>
+                    )}
                   </td>
                   <td title={`${t.flipCount} flips, ${t.retryPassCount} retries in ${t.runsInWindow} runs`}>
                     {Number(t.score).toFixed(2)}

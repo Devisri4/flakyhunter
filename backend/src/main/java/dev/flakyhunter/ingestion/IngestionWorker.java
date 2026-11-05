@@ -1,7 +1,5 @@
 package dev.flakyhunter.ingestion;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +9,8 @@ import java.util.concurrent.Executors;
 
 import dev.flakyhunter.catalog.RunMetadata;
 import dev.flakyhunter.catalog.RunWriter;
-import dev.flakyhunter.parsing.JUnitXmlParser;
+import dev.flakyhunter.notification.Notifier;
+import dev.flakyhunter.parsing.ReportParsers;
 import dev.flakyhunter.parsing.ParsedTest;
 import dev.flakyhunter.parsing.ReportParseException;
 import org.slf4j.Logger;
@@ -33,20 +32,22 @@ public class IngestionWorker {
 
 	private final JdbcClient db;
 	private final TransactionTemplate tx;
-	private final JUnitXmlParser parser;
+	private final ReportParsers parsers;
 	private final RunWriter runWriter;
 	private final IngestionProperties props;
+	private final Notifier notifier;
 
-	IngestionWorker(JdbcClient db, TransactionTemplate tx, JUnitXmlParser parser, RunWriter runWriter,
-			IngestionProperties props) {
+	IngestionWorker(JdbcClient db, TransactionTemplate tx, ReportParsers parsers, RunWriter runWriter,
+			IngestionProperties props, Notifier notifier) {
 		this.db = db;
 		this.tx = tx;
-		this.parser = parser;
+		this.parsers = parsers;
 		this.runWriter = runWriter;
 		this.props = props;
+		this.notifier = notifier;
 	}
 
-	record Claimed(UUID id, UUID projectId, int attempts, String commitSha, String branch, String ciProvider,
+	record Claimed(UUID id, UUID projectId, String format, int attempts, String commitSha, String branch, String ciProvider,
 			String buildUrl, OffsetDateTime triggeredAt) {
 	}
 
@@ -75,7 +76,7 @@ public class IngestionWorker {
 				                        and (e.triggered_at, e.created_at, e.id) < (j.triggered_at, j.created_at, j.id))
 				    order by j.created_at
 				    for update skip locked limit :limit)
-				returning id, project_id, attempts, commit_sha, branch, ci_provider, build_url, triggered_at""")
+				returning id, project_id, format, attempts, commit_sha, branch, ci_provider, build_url, triggered_at""")
 				.param("limit", props.batchSize())
 				.query(Claimed.class).list());
 		if (claimed == null || claimed.isEmpty()) {
@@ -91,19 +92,24 @@ public class IngestionWorker {
 
 	void process(Claimed job) {
 		try {
-			tx.executeWithoutResult(status -> {
+			RunWriter.Written written = tx.execute(status -> {
 				db.sql("select 1 from pg_advisory_xact_lock(hashtextextended(cast(:project as text), 0))")
 						.param("project", job.projectId()).query(Integer.class).single();
-				List<ParsedTest> tests = parser.parse(loadFiles(job.id()));
+				List<ParsedTest> tests = parsers.parse(ReportParsers.Format.valueOf(job.format()), loadFiles(job.id()));
 				if (tests.isEmpty()) {
 					throw new ReportParseException("The report contains no test cases");
 				}
 				RunMetadata meta = new RunMetadata(job.commitSha(), job.branch(), job.ciProvider(), job.buildUrl(),
 						job.triggeredAt());
-				long runId = runWriter.write(job.projectId(), meta, tests);
-				finish(job.id(), "DONE", null, runId);
+				RunWriter.Written result = runWriter.write(job.projectId(), meta, tests);
+				finish(job.id(), "DONE", null, result.runId());
+				return result;
 			});
 			log.info("Ingested job {} for project {}", job.id(), job.projectId());
+			// only after the commit: an alert must never announce data that was rolled back
+			if (written != null && !written.newlyFlaky().isEmpty()) {
+				notifier.newlyFlaky(job.projectId(), written.runId(), written.newlyFlaky());
+			}
 		}
 		catch (ReportParseException e) {
 			// a broken report stays broken: fail at once with a message the user can act on
@@ -141,16 +147,16 @@ public class IngestionWorker {
 				.update();
 	}
 
-	private List<InputStream> loadFiles(UUID jobId) {
+	private List<byte[]> loadFiles(UUID jobId) {
 		List<byte[]> compressed = db.sql("select content from ingestion_job_files where job_id = :id order by seq")
 				.param("id", jobId)
 				.query((rs, n) -> rs.getBytes(1)).list();
 		long budget = props.maxUncompressedBytes();
-		List<InputStream> files = new ArrayList<>();
+		List<byte[]> files = new ArrayList<>();
 		for (byte[] gz : compressed) {
 			byte[] plain = Gzip.decompress(gz, budget);
 			budget -= plain.length;
-			files.add(new ByteArrayInputStream(plain));
+			files.add(plain);
 		}
 		return files;
 	}

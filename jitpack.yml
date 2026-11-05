@@ -1,0 +1,6 @@
+# Lets other projects use the JUnit 5 extension straight from GitHub via https://jitpack.io
+# (dependency: com.github.Devisri4.flakyhunter:flakyhunter-junit5:<tag or commit>)
+jdk:
+  - openjdk17
+install:
+  - cd junit5-extension && mvn -B install -DskipTests

@@ -36,9 +36,10 @@ public class StatsUpdater {
 		this.scorer = scorer;
 	}
 
-	public void apply(Long runId, String commit, OffsetDateTime runTime, List<Observation> observations) {
+	/** Applies the results and returns the ids of tests that just became FLAKY. */
+	public List<Long> apply(Long runId, String commit, OffsetDateTime runTime, List<Observation> observations) {
 		if (observations.isEmpty()) {
-			return;
+			return List.of();
 		}
 		Map<Long, Current> current = load(observations.stream().map(Observation::testCaseId).toArray(Long[]::new));
 		List<Update> updates = new ArrayList<>(observations.size());
@@ -48,6 +49,10 @@ public class StatsUpdater {
 			updates.add(new Update(o.testCaseId(), window, scorer.score(window), c.state()));
 		}
 		save(updates, runId, runTime);
+		return updates.stream()
+				.filter(u -> u.stateChanged() && u.stats().state() == TestState.FLAKY)
+				.map(Update::id)
+				.toList();
 	}
 
 	/** Recomputes from scratch (nightly safety net): the caller provides each test's rebuilt window. */

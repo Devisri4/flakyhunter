@@ -467,6 +467,8 @@ p.notice.error {
 
 .demo-banner {
   border: 1px solid var(--primary);
+  display: block; /* one flowing sentence (.notice stacks its children) */
+  line-height: 1.6;
 }
 
 .empty {
@@ -610,4 +612,32 @@ h3 {
   .hero h1 {
     font-size: 2rem;
   }
+}
+
+/* --- quarantine (Phase 6) --- */
+
+:root {
+  --quarantine: #0e7490;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --quarantine: #67d4ea;
+  }
+}
+
+.state-quarantined {
+  color: var(--quarantine);
+  margin-left: 6px;
+}
+
+.card.quarantined {
+  border-color: var(--quarantine);
+}
+
+.quarantine-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 520px;
 }

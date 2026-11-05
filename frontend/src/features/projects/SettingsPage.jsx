@@ -12,6 +12,7 @@ import {
   useRemoveMember,
   useRevokeApiKey,
 } from '../../api/hooks'
+import { WebhooksSection } from './WebhooksSection'
 
 const ROLES = ['OWNER', 'MEMBER', 'VIEWER']
 
@@ -35,6 +36,7 @@ export function SettingsPage() {
       <h1>Settings</h1>
       <ApiKeysSection slug={slug} />
       <MembersSection slug={slug} />
+      <WebhooksSection slug={slug} />
       <DangerZone slug={slug} name={project.data.name} />
     </>
   )

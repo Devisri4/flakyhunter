@@ -42,18 +42,23 @@ public class RunWriter {
 		this.stats = stats;
 	}
 
-	public long write(UUID projectId, RunMetadata meta, List<ParsedTest> tests) {
+	/** The new run's id and the tests that became FLAKY with it (for alerts). */
+	public record Written(long runId, List<Long> newlyFlaky) {
+	}
+
+	public Written write(UUID projectId, RunMetadata meta, List<ParsedTest> tests) {
 		long runId = insertRun(projectId, meta, tests);
 		String commit = meta.commitSha() == null ? null
 				: meta.commitSha().substring(0, Math.min(COMMIT_LENGTH, meta.commitSha().length()));
+		List<Long> newlyFlaky = new ArrayList<>();
 		for (int from = 0; from < tests.size(); from += CHUNK) {
 			List<ParsedTest> chunk = tests.subList(from, Math.min(tests.size(), from + CHUNK));
 			Map<String, Long> caseIds = upsertCases(projectId, meta, chunk);
 			Map<Integer, Long> signatureIds = upsertSignatures(projectId, meta, chunk);
 			insertResults(runId, chunk, caseIds, signatureIds);
-			stats.apply(runId, commit, meta.triggeredAt(), observations(chunk, caseIds));
+			newlyFlaky.addAll(stats.apply(runId, commit, meta.triggeredAt(), observations(chunk, caseIds)));
 		}
-		return runId;
+		return new Written(runId, newlyFlaky);
 	}
 
 	private long insertRun(UUID projectId, RunMetadata meta, List<ParsedTest> tests) {

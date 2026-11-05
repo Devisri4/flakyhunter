@@ -44,9 +44,10 @@ public class IngestionService {
 		if (files.size() > props.maxFiles()) {
 			throw ApiException.badRequest("At most " + props.maxFiles() + " files per upload");
 		}
-		String format = meta.format() == null || meta.format().isBlank() ? "JUNIT" : meta.format().strip().toUpperCase();
-		if (!format.equals("JUNIT")) {
-			throw ApiException.badRequest("Unsupported format '" + meta.format() + "'. Supported: junit");
+		String format = meta.format() == null || meta.format().isBlank() ? "AUTO" : meta.format().strip().toUpperCase();
+		if (!format.equals("AUTO") && !format.equals("JUNIT") && !format.equals("PLAYWRIGHT")) {
+			throw ApiException.badRequest(
+					"Unsupported format '" + meta.format() + "'. Supported: junit, playwright (or leave it out to detect)");
 		}
 		String idempotencyKey = idempotencyKey(meta);
 		UUID jobId = UUID.randomUUID();

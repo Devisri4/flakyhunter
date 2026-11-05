@@ -1,0 +1,66 @@
+name: e2e
+
+# After every push to main: wait until Render serves the latest backend commit, then click through the live site.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: e2e
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    env:
+      BASE_URL: https://flakyhunter.vercel.app
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # to find the latest commit that changed the backend
+
+      - name: Wait for the deploy
+        run: |
+          # Render only redeploys when backend/ changes, so wait for the newest commit that touched it
+          want=$(git log -1 --format=%H -- backend)
+          echo "Waiting for backend commit $want"
+          for i in $(seq 1 60); do
+            live=$(curl -s "$BASE_URL/api/actuator/info" | sed -n 's/.*"commit":"\([0-9a-f]*\)".*/\1/p')
+            if [ "$live" = "$want" ]; then echo "Backend $live is live"; break; fi
+            echo "live: ${live:-asleep or starting} — waiting"; sleep 20
+          done
+          sleep 60 # Vercel's frontend build usually finishes within a minute
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Playwright
+        working-directory: e2e
+        run: |
+          npm install
+          npx playwright install --with-deps chromium
+      - name: Run end-to-end tests
+        working-directory: e2e
+        env:
+          E2E_EMAIL: ${{ secrets.E2E_EMAIL }}
+          E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
+          E2E_SLUG: ${{ secrets.E2E_SLUG }}
+        run: npx playwright test
+
+      - name: Keep the report, traces and videos
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: e2e/playwright-report
+          if-no-files-found: ignore
+
+      # Dogfooding: FlakyHunter tracks its own end-to-end tests (Playwright JSON)
+      - name: Upload test results to FlakyHunter
+        if: always()
+        uses: ./github-action
+        with:
+          api-key: ${{ secrets.FLAKYHUNTER_API_KEY }}
+          files: e2e/results.json
+          format: playwright

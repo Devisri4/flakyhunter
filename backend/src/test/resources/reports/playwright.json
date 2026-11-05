@@ -1,0 +1,81 @@
+{
+  "config": {
+    "projects": [ { "name": "chromium" }, { "name": "firefox" } ]
+  },
+  "suites": [
+    {
+      "title": "checkout.spec.ts",
+      "file": "checkout.spec.ts",
+      "specs": [],
+      "suites": [
+        {
+          "title": "Cart",
+          "file": "checkout.spec.ts",
+          "specs": [
+            {
+              "title": "adds an item",
+              "file": "checkout.spec.ts",
+              "tests": [
+                {
+                  "projectName": "chromium",
+                  "status": "expected",
+                  "results": [ { "status": "passed", "duration": 812, "retry": 0 } ]
+                },
+                {
+                  "projectName": "firefox",
+                  "status": "flaky",
+                  "results": [
+                    {
+                      "status": "failed", "duration": 5012, "retry": 0,
+                      "error": {
+                        "message": "\u001b[31mTimeoutError: locator.click: Timeout 5000ms exceeded.\u001b[39m\nCall log:\n  - waiting for #add-42",
+                        "stack": "TimeoutError: locator.click: Timeout 5000ms exceeded.\n    at /tests/checkout.spec.ts:14:22"
+                      }
+                    },
+                    { "status": "passed", "duration": 900, "retry": 1 }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "applies a coupon",
+              "file": "checkout.spec.ts",
+              "tests": [
+                {
+                  "projectName": "chromium",
+                  "status": "unexpected",
+                  "results": [
+                    { "status": "failed", "duration": 300, "retry": 0,
+                      "errors": [ { "message": "Error: expect(received).toBe(expected)\n\nExpected: 42\nReceived: 41" } ] },
+                    { "status": "failed", "duration": 310, "retry": 1,
+                      "errors": [ { "message": "Error: expect(received).toBe(expected)\n\nExpected: 42\nReceived: 41" } ] }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "search.spec.ts",
+      "file": "search.spec.ts",
+      "specs": [
+        {
+          "title": "finds a product",
+          "file": "search.spec.ts",
+          "tests": [
+            { "projectName": "chromium", "status": "unexpected",
+              "results": [ { "status": "timedOut", "duration": 30000, "retry": 0,
+                             "error": { "message": "Test timeout of 30000ms exceeded." } } ] }
+          ]
+        },
+        {
+          "title": "exports results",
+          "file": "search.spec.ts",
+          "tests": [ { "projectName": "chromium", "status": "skipped", "results": [ { "status": "skipped", "duration": 0 } ] } ]
+        }
+      ]
+    }
+  ]
+}

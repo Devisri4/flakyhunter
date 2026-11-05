@@ -1,9 +1,10 @@
 import { Link, useParams } from 'react-router'
-import { useTestDetail, useTestResults } from '../../api/hooks'
+import { useProject, useTestDetail, useTestResults } from '../../api/hooks'
 import { TrendLine } from '../../components/Charts'
 import { Skeleton } from '../../components/Skeleton'
 import { StateBadge, STATE_INFO } from '../../components/TestBadges'
 import { formatDateTime, formatDuration, shortSha } from '../../lib/format'
+import { QuarantinePanel } from './QuarantinePanel'
 
 const OUTCOME = {
   PASSED: { cell: 'P', icon: '✓', label: 'passed' },
@@ -115,10 +116,13 @@ export function TestDetailPage() {
   const { slug = '', id = '' } = useParams()
   const detail = useTestDetail(slug, id)
   const results = useTestResults(slug, id, 50)
+  const project = useProject(slug)
 
   if (detail.isLoading) return <Skeleton height={400} />
   if (detail.error) return <p className="error">{detail.error.message}</p>
-  const { test, firstSeen, breakdown, durations, history, signatures } = detail.data
+  const { test, firstSeen, breakdown, durations, history, signatures, quarantine, quarantines } = detail.data
+  const role = project.data?.role
+  const canManage = !project.data?.publicDemo && (role === 'OWNER' || role === 'MEMBER')
   const durationData = (results.data ?? [])
     .filter((r) => r.outcome !== 'SKIPPED')
     .reverse()
@@ -132,6 +136,7 @@ export function TestDetailPage() {
       <p className="muted">{test.suite}</p>
       <h1 className="test-title">
         {test.name} <StateBadge state={test.state} />
+        {test.quarantined && <span className="state state-quarantined">🧊 Quarantined</span>}
       </h1>
       <p className="muted small">
         {test.file && (
@@ -149,6 +154,14 @@ export function TestDetailPage() {
       </section>
 
       <ScoreBreakdown test={test} breakdown={breakdown} />
+
+      <QuarantinePanel
+        slug={slug}
+        testId={id}
+        active={quarantine}
+        history={quarantines}
+        canManage={canManage}
+      />
 
       <section className="card">
         <h2>Duration</h2>

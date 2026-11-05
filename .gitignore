@@ -14,3 +14,8 @@ dist/
 *.iml
 .DS_Store
 Thumbs.db
+
+# test output
+test-results/
+playwright-report/
+results.json

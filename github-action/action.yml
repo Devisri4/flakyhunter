@@ -1,0 +1,80 @@
+name: FlakyHunter upload
+description: Upload JUnit XML or Playwright JSON test results to FlakyHunter, so it can find your flaky tests.
+author: Devi Sri Mudududla
+branding:
+  icon: search
+  color: purple
+
+inputs:
+  api-key:
+    description: The project's FlakyHunter API key. Store it as a secret, e.g. secrets.FLAKYHUNTER_API_KEY.
+    required: true
+  files:
+    description: Report files to upload (a glob, several separated by spaces or new lines).
+    required: false
+    default: |
+      **/target/surefire-reports/TEST-*.xml
+      **/build/test-results/test/*.xml
+  format:
+    description: "junit, playwright, or empty to detect from each file's content."
+    required: false
+    default: ''
+  url:
+    description: FlakyHunter address.
+    required: false
+    default: https://flakyhunter.vercel.app
+  fail-on-error:
+    description: "Fail the step when the upload fails (default false: uploading must never break your build)."
+    required: false
+    default: 'false'
+
+outputs:
+  job-id:
+    description: Id of the upload job (check it at <url>/api/v1/ingest/jobs/<job-id>).
+    value: ${{ steps.upload.outputs.job-id }}
+
+runs:
+  using: composite
+  steps:
+    - id: upload
+      shell: bash
+      env:
+        FH_KEY: ${{ inputs.api-key }}
+        FH_FILES: ${{ inputs.files }}
+        FH_FORMAT: ${{ inputs.format }}
+        FH_URL: ${{ inputs.url }}
+        FH_STRICT: ${{ inputs.fail-on-error }}
+      run: |
+        set -uo pipefail
+        shopt -s globstar nullglob
+        fail() { echo "::warning title=FlakyHunter::$1"; if [ "$FH_STRICT" = "true" ]; then exit 1; fi; exit 0; }
+
+        if [ -z "$FH_KEY" ]; then fail "No api-key given (is the secret set? secrets are empty for pull requests from forks)"; fi
+
+        args=()
+        count=0
+        for pattern in $FH_FILES; do
+          for f in $pattern; do
+            if [ -f "$f" ] && [ "$count" -lt 20 ]; then args+=(-F "files=@$f"); count=$((count + 1)); fi
+          done
+        done
+        if [ "$count" -eq 0 ]; then fail "No report files matched: $FH_FILES"; fi
+        echo "Uploading $count report file(s) to FlakyHunter"
+
+        [ -n "$FH_FORMAT" ] && args+=(-F "format=$FH_FORMAT")
+        branch="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
+        response=$(curl -sS --fail-with-body --retry 2 --max-time 60 -X POST "${FH_URL%/}/api/v1/ingest" \
+          -H "X-Api-Key: $FH_KEY" \
+          "${args[@]}" \
+          -F "branch=$branch" \
+          -F "commit=$GITHUB_SHA" \
+          -F "ciProvider=github" \
+          -F "runId=$GITHUB_RUN_ID" \
+          -F "runAttempt=$GITHUB_RUN_ATTEMPT" \
+          -F "buildUrl=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID") || fail "Upload failed: $response"
+
+        echo "$response"
+        job_id=$(echo "$response" | sed -n 's/.*"jobId":"\([^"]*\)".*/\1/p')
+        echo "job-id=$job_id" >> "$GITHUB_OUTPUT"
+        echo "### 🔎 FlakyHunter" >> "$GITHUB_STEP_SUMMARY"
+        echo "Uploaded $count report file(s); job \`$job_id\`." >> "$GITHUB_STEP_SUMMARY"

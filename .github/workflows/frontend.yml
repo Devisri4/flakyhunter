@@ -22,5 +22,14 @@ jobs:
       # No package-lock.json yet (no Node on the dev laptop), so `npm install` instead of `npm ci`.
       - run: npm install
       - run: npm run lint
-      - run: npm test
+      # JUnit XML as well, so FlakyHunter can track the frontend tests too
+      - run: npm test -- --reporter=default --reporter=junit --outputFile.junit=test-results/junit.xml
       - run: npm run build
+
+      # Dogfooding (needs the FLAKYHUNTER_API_KEY repository secret; without it only a warning)
+      - name: Upload test results to FlakyHunter
+        if: always()
+        uses: ./github-action
+        with:
+          api-key: ${{ secrets.FLAKYHUNTER_API_KEY }}
+          files: frontend/test-results/junit.xml

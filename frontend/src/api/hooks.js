@@ -129,7 +129,7 @@ export function useUploads(slug) {
 
 // --- tests & signatures ---
 
-/** @param {{ state?: string, q?: string, sort?: string, page?: number, size?: number }} opts */
+/** @param {{ state?: string, quarantined?: boolean, q?: string, sort?: string, page?: number, size?: number }} opts */
 export function useTests(slug, opts) {
   const params = new URLSearchParams({
     page: String(opts.page ?? 0),
@@ -137,6 +137,7 @@ export function useTests(slug, opts) {
     sort: opts.sort ?? 'score',
   })
   if (opts.state) params.set('state', opts.state)
+  if (opts.quarantined !== undefined) params.set('quarantined', String(opts.quarantined))
   if (opts.q) params.set('q', opts.q)
   return useQuery({
     queryKey: ['tests', slug, params.toString()],
@@ -185,6 +186,63 @@ export function useTestResults(slug, id, limit = 50) {
     queryKey: ['test-results', slug, id, limit],
     queryFn: () => api(`/api/projects/${slug}/tests/${id}/results?limit=${limit}`),
   })
+}
+
+// --- quarantine & webhooks ---
+
+/** Active quarantines: [{ testId, fingerprint, suite, name, reason, expiresAt, createdAt, createdBy }] */
+export function useQuarantineList(slug) {
+  return useQuery({ queryKey: ['quarantine', slug], queryFn: () => api(`/api/projects/${slug}/quarantine`) })
+}
+
+function useTestMutation(slug, id, mutationFn) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['test', slug, id] })
+      qc.invalidateQueries({ queryKey: ['tests', slug] })
+      qc.invalidateQueries({ queryKey: ['quarantine', slug] })
+    },
+  })
+}
+
+export function useQuarantineTest(slug, id) {
+  return useTestMutation(slug, id, (body) =>
+    api(`/api/projects/${slug}/tests/${id}/quarantine`, { method: 'POST', body }),
+  )
+}
+
+export function useLiftQuarantine(slug, id) {
+  return useTestMutation(slug, id, () => api(`/api/projects/${slug}/tests/${id}/quarantine`, { method: 'DELETE' }))
+}
+
+/** [{ id, kind, url, enabled, createdAt, lastStatus, lastDeliveryAt }] */
+export function useWebhooks(slug) {
+  return useQuery({ queryKey: ['webhooks', slug], queryFn: () => api(`/api/projects/${slug}/webhooks`) })
+}
+
+function useWebhookMutation(slug, mutationFn) {
+  const qc = useQueryClient()
+  return useMutation({ mutationFn, onSuccess: () => qc.invalidateQueries({ queryKey: ['webhooks', slug] }) })
+}
+
+export function useCreateWebhook(slug) {
+  return useWebhookMutation(slug, (body) => api(`/api/projects/${slug}/webhooks`, { method: 'POST', body }))
+}
+
+export function useToggleWebhook(slug) {
+  return useWebhookMutation(slug, ({ id, enabled }) =>
+    api(`/api/projects/${slug}/webhooks/${id}`, { method: 'PATCH', body: { enabled } }),
+  )
+}
+
+export function useTestWebhook(slug) {
+  return useWebhookMutation(slug, (id) => api(`/api/projects/${slug}/webhooks/${id}/test`, { method: 'POST' }))
+}
+
+export function useDeleteWebhook(slug) {
+  return useWebhookMutation(slug, (id) => api(`/api/projects/${slug}/webhooks/${id}`, { method: 'DELETE' }))
 }
 
 // --- API keys ---

@@ -118,6 +118,12 @@ public class AuthService {
 		return new Session(user, access, refresh, row.getId());
 	}
 
+	/** The logged-in user (a deleted account behaves like a logged-out one). */
+	@Transactional(readOnly = true)
+	public User currentUser(UUID userId) {
+		return users.findById(userId).orElseThrow(() -> ApiException.unauthorized("Login required"));
+	}
+
 	static String normaliseEmail(String email) {
 		return email.strip().toLowerCase(Locale.ROOT);
 	}

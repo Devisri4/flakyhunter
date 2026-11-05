@@ -21,9 +21,17 @@ public class TestQueries {
 		this.db = db;
 	}
 
+	/** {@code quarantined}: the test has an active quarantine (CI tools skip it). */
 	public record TestCaseView(long id, String suite, String name, String file, String state, BigDecimal score,
 			String windowOutcomes, int runsInWindow, int flipCount, int retryPassCount, int failStreak,
-			OffsetDateTime lastSeen) {
+			OffsetDateTime lastSeen, boolean quarantined) {
+	}
+
+	/** SQL for the quarantined column, for queries over test_cases aliased as {@code c} or unaliased. */
+	static String quarantinedColumn(String alias) {
+		String id = alias.isEmpty() ? "id" : alias + ".id";
+		return "exists(select 1 from quarantines q where q.test_case_id = " + id
+				+ " and q.lifted_at is null and q.expires_at > now()) as quarantined";
 	}
 
 	public record SignatureView(long id, String exceptionType, String normalizedMessage, String sampleStack,
@@ -36,11 +44,16 @@ public class TestQueries {
 			"lastSeen", "last_seen desc",
 			"failStreak", "fail_streak desc, score desc");
 
-	public RunQueries.Page<TestCaseView> list(UUID projectId, TestState state, String search, String sort, int page,
-			int size) {
+	public RunQueries.Page<TestCaseView> list(UUID projectId, TestState state, Boolean quarantined, String search,
+			String sort, int page, int size) {
 		StringBuilder where = new StringBuilder(" where project_id = :project");
 		if (state != null) {
 			where.append(" and state = :state");
+		}
+		if (quarantined != null) {
+			where.append(quarantined ? " and " : " and not ").append(
+					"exists(select 1 from quarantines q where q.test_case_id = test_cases.id and q.lifted_at is null"
+							+ " and q.expires_at > now())");
 		}
 		boolean searching = search != null && !search.isBlank();
 		if (searching) {
@@ -49,8 +62,9 @@ public class TestQueries {
 		String orderBy = SORTS.getOrDefault(sort, SORTS.get("score"));
 		var query = db.sql("""
 				select id, suite, name, file, state, score, window_outcomes, runs_in_window, flip_count,
-				       retry_pass_count, fail_streak, last_seen
-				from test_cases""" + where + " order by " + orderBy + ", id limit :limit offset :offset")
+				       retry_pass_count, fail_streak, last_seen, %s
+				from test_cases""".formatted(quarantinedColumn("test_cases")) + where + " order by " + orderBy
+				+ ", id limit :limit offset :offset")
 				.param("project", projectId)
 				.param("limit", size)
 				.param("offset", (long) page * size);
