@@ -496,12 +496,22 @@ Each phase ends **deployed, tested and demoable**. Sizes: S ≈ 2–3 evenings, 
 > 10/min per IP+email, signup 20/h per IP, ingest 30/min per key — so the Phase 1 open item is closed.
 > Tests drive the worker directly (`worker-enabled=false`) so they don't depend on scheduler timing.
 
-### Phase 3 — Flakiness engine and signatures (M)
-- [ ] V3 migration: stats columns, state_changes, failure_signatures, daily_stats
-- [ ] Incremental stats + scoring + state machine; nightly recompute + retention job
-- [ ] Signature normaliser and grouping
-- [ ] Table-driven scoring tests; property-style tests for the normaliser
+### Phase 3 — Flakiness engine and signatures (M) ✅ done 2026-11-05
+- [x] V3 migration: stats columns, state_changes, failure_signatures, daily_stats
+- [x] Incremental stats + scoring + state machine; nightly recompute + retention job
+- [x] Signature normaliser and grouping
+- [x] Table-driven scoring tests; property-style tests for the normaliser
 - **Done when:** a fixture history with known flaky/broken tests produces the expected states.
+
+> **Phase 3 notes:** Skipped results never enter a test's window (so `window_outcomes` holds only P/F/R).
+> The "nightly" jobs run when due (an hourly check against `maintenance_log`), because the free server sleeps.
+> `daily_stats` stores `total_duration_ms` (average = total / runs) instead of `avg_run_duration_ms`.
+> Already visible in the UI: state badges, a basic Tests page (filter/search/sort, outcome strip), Failure groups
+> page and a Test health card. `/api/actuator/info` reports build info (build time shows 1980 because of Maven's
+> reproducible-build timestamp — set `project.build.outputTimestamp` in Phase 7 if a real time is wanted).
+> `examples/sample-history/` holds 12 reports that show every state; uploaded live to the "Acme Shop" project.
+> **For Phase 4:** process one project's queued jobs strictly in `triggered_at` order (today a batch of 3 can be
+> handled out of order; the recompute fixes it later), and show long commit names in full when they aren't SHAs.
 
 ### Phase 4 — Dashboard UI (L)
 - [ ] Summary + trends endpoints; test explorer with filters/sorting/pagination; test detail endpoints
