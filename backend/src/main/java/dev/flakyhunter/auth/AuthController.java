@@ -71,9 +71,14 @@ class AuthController {
 
 	@PostMapping("/login")
 	ResponseEntity<UserResponse> login(@Valid @RequestBody LoginRequest body, HttpServletRequest request) {
+		String email = body.email().strip().toLowerCase(Locale.ROOT);
 		// per IP + email: slows down password guessing without letting one IP lock out everyone else
-		rateLimiter.check("login:" + request.getRemoteAddr() + ":" + body.email().strip().toLowerCase(Locale.ROOT),
+		rateLimiter.check("login:" + request.getRemoteAddr() + ":" + email,
 				rateLimiter.limits().loginPerMinute(), Duration.ofMinutes(1));
+		// per email alone: the client IP comes from X-Forwarded-For, which a caller can fake, so this limit
+		// is what really caps guessing one account's password
+		rateLimiter.check("login-email:" + email, rateLimiter.limits().loginPerEmailPer15Minutes(),
+				Duration.ofMinutes(15));
 		return withSession(HttpStatus.OK, auth.login(body.email(), body.password()));
 	}
 

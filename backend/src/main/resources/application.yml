@@ -23,7 +23,8 @@ spring:
 server:
   # Render tells the app which port to use through $PORT
   port: ${PORT:8080}
-  # Behind Vercel/Render proxies: trust X-Forwarded-* so the app knows requests were HTTPS
+  # Behind Vercel/Render proxies: trust X-Forwarded-* so the app knows requests were HTTPS.
+  # The client IP from X-Forwarded-For can be faked, so security limits never rely on the IP alone.
   forward-headers-strategy: framework
 
 flakyhunter:
@@ -40,8 +41,17 @@ flakyhunter:
     max-files: 20
   rate-limits:
     login-per-minute: 10
+    login-per-email-per15-minutes: 30
     signup-per-hour: 20
     ingest-per-minute: 30
+  demo:
+    # the public read-only demo project at /p/demo (generated on startup, topped up daily)
+    enabled: ${DEMO_MODE:true}
+
+# /api/actuator/info: build version/time, plus the deployed commit (Render sets RENDER_GIT_COMMIT)
+info:
+  deploy:
+    commit: ${RENDER_GIT_COMMIT:local}
 
 # Everything the browser calls lives under /api, so the Vercel /api/* rewrite covers it.
 management:
@@ -53,3 +63,6 @@ management:
   endpoint:
     health:
       show-components: always
+  info:
+    env:
+      enabled: true

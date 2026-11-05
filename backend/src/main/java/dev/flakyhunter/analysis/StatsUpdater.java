@@ -1,6 +1,7 @@
 package dev.flakyhunter.analysis;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.sql.Array;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public class StatsUpdater {
 		this.scorer = scorer;
 	}
 
-	public void apply(Long runId, String commit, List<Observation> observations) {
+	public void apply(Long runId, String commit, OffsetDateTime runTime, List<Observation> observations) {
 		if (observations.isEmpty()) {
 			return;
 		}
@@ -46,7 +47,7 @@ public class StatsUpdater {
 			Window window = windowOf(c).append(o.outcome(), commit, scorer.windowSize());
 			updates.add(new Update(o.testCaseId(), window, scorer.score(window), c.state()));
 		}
-		save(updates, runId);
+		save(updates, runId, runTime);
 	}
 
 	/** Recomputes from scratch (nightly safety net): the caller provides each test's rebuilt window. */
@@ -57,7 +58,7 @@ public class StatsUpdater {
 		Map<Long, Current> current = load(windows.keySet().toArray(Long[]::new));
 		List<Update> updates = new ArrayList<>(windows.size());
 		windows.forEach((id, window) -> updates.add(new Update(id, window, scorer.score(window), current.get(id).state())));
-		return save(updates, null);
+		return save(updates, null, null);
 	}
 
 	record Update(long id, Window window, FlakinessScorer.Stats stats, String previousState) {
@@ -84,7 +85,7 @@ public class StatsUpdater {
 	}
 
 	/** Writes all updates with one statement, plus state_changes rows for changed verdicts. Returns that count. */
-	private int save(List<Update> updates, Long runId) {
+	private int save(List<Update> updates, Long runId, OffsetDateTime changedAt) {
 		int n = updates.size();
 		Long[] ids = new Long[n];
 		String[] windows = new String[n];
@@ -133,9 +134,10 @@ public class StatsUpdater {
 		List<Update> changed = updates.stream().filter(Update::stateChanged).toList();
 		if (!changed.isEmpty()) {
 			jdbc.update(con -> {
+				// dated with the CI run's time (not the upload time), so "newly flaky this week" means the runs
 				PreparedStatement ps = con.prepareStatement("""
-						insert into state_changes (test_case_id, from_state, to_state, score, run_id)
-						select u.id, u.from_state, u.to_state, u.score, ?
+						insert into state_changes (test_case_id, from_state, to_state, score, run_id, changed_at)
+						select u.id, u.from_state, u.to_state, u.score, ?, coalesce(?, now())
 						from unnest(?::bigint[], ?::text[], ?::text[], ?::numeric[]) as u(id, from_state, to_state, score)""");
 				if (runId == null) {
 					ps.setNull(1, java.sql.Types.BIGINT);
@@ -143,10 +145,11 @@ public class StatsUpdater {
 				else {
 					ps.setLong(1, runId);
 				}
-				ps.setArray(2, con.createArrayOf("bigint", changed.stream().map(Update::id).toArray(Long[]::new)));
-				ps.setArray(3, con.createArrayOf("text", changed.stream().map(Update::previousState).toArray(String[]::new)));
-				ps.setArray(4, con.createArrayOf("text", changed.stream().map(u -> u.stats().state().name()).toArray(String[]::new)));
-				ps.setArray(5, con.createArrayOf("numeric", changed.stream().map(u -> u.stats().score()).toArray(BigDecimal[]::new)));
+				ps.setObject(2, changedAt, java.sql.Types.TIMESTAMP_WITH_TIMEZONE);
+				ps.setArray(3, con.createArrayOf("bigint", changed.stream().map(Update::id).toArray(Long[]::new)));
+				ps.setArray(4, con.createArrayOf("text", changed.stream().map(Update::previousState).toArray(String[]::new)));
+				ps.setArray(5, con.createArrayOf("text", changed.stream().map(u -> u.stats().state().name()).toArray(String[]::new)));
+				ps.setArray(6, con.createArrayOf("numeric", changed.stream().map(u -> u.stats().score()).toArray(BigDecimal[]::new)));
 				return ps;
 			});
 		}

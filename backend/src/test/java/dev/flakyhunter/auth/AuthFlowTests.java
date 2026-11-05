@@ -92,6 +92,25 @@ class AuthFlowTests extends IntegrationTest {
 	}
 
 	@Test
+	void changingTheClientIpDoesNotEscapeThePerEmailLimit() throws Exception {
+		String email = uniqueEmail();
+		for (int i = 0; i < 30; i++) {
+			String ip = "10.0." + (i / 250) + "." + (i % 250 + 1); // a new (faked) address every time
+			mvc.perform(post("/api/auth/login").with(csrf()).with(r -> {
+				r.setRemoteAddr(ip);
+				return r;
+			}).contentType(MediaType.APPLICATION_JSON)
+					.content("{\"email\":\"%s\",\"password\":\"guess-%d\"}".formatted(email, i)))
+					.andExpect(status().isUnauthorized());
+		}
+		mvc.perform(post("/api/auth/login").with(csrf()).with(r -> {
+			r.setRemoteAddr("10.9.9.9");
+			return r;
+		}).contentType(MediaType.APPLICATION_JSON).content("{\"email\":\"%s\",\"password\":\"x-123456\"}".formatted(email)))
+				.andExpect(status().isTooManyRequests());
+	}
+
+	@Test
 	void stateChangingRequestsNeedTheCsrfToken() throws Exception {
 		mvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
 				.content("{\"email\":\"a@b.c\",\"password\":\"whatever1\"}"))

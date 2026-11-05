@@ -79,7 +79,9 @@ export function TestsPage() {
               {tests.data.content.map((t) => (
                 <tr key={t.id}>
                   <td>
-                    <span className="muted">{t.suite} ›</span> {t.name}
+                    <Link to={`/p/${slug}/tests/${t.id}`}>
+                      <span className="muted">{t.suite} ›</span> {t.name}
+                    </Link>
                   </td>
                   <td>
                     <StateBadge state={t.state} />

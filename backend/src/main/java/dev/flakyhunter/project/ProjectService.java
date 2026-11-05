@@ -32,7 +32,7 @@ public class ProjectService {
 			throw ApiException.badRequest(
 					"Slug must be 3-40 characters: lower-case letters, digits and single hyphens (e.g. acme-shop)");
 		}
-		if (projects.existsBySlug(slug)) {
+		if (Slugs.isReserved(slug) || projects.existsBySlug(slug)) {
 			throw ApiException.conflict("The slug '" + slug + "' is already taken");
 		}
 		String branch = defaultBranch == null || defaultBranch.isBlank() ? "main" : defaultBranch.strip();

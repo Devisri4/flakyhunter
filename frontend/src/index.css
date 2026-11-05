@@ -429,3 +429,185 @@ p.notice.error {
 .small {
   font-size: 0.85rem;
 }
+
+/* --- dashboard (Phase 4) --- */
+
+.kpis {
+  margin-bottom: 16px;
+}
+
+.kpi {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.grid-2 > .card {
+  margin-bottom: 0;
+}
+
+.grid-2 + * {
+  margin-top: 16px;
+}
+
+.chart-tooltip {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 10px;
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.15);
+}
+
+.demo-banner {
+  border: 1px solid var(--primary);
+}
+
+.empty {
+  text-align: center;
+  padding: 20px 8px;
+}
+
+/* loading placeholder */
+.skeleton {
+  border-radius: 12px;
+  margin-bottom: 16px;
+  background: linear-gradient(90deg, var(--card) 25%, var(--border) 50%, var(--card) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton { animation: none; }
+}
+
+/* --- test detail --- */
+
+.test-title {
+  margin-top: 0;
+  word-break: break-word;
+}
+
+.heatmap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.hcell {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  text-decoration: none;
+}
+
+.hcell.mini {
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+  vertical-align: middle;
+}
+
+.hcell:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 1px;
+}
+
+.cell-S {
+  background: var(--state-new);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  color: var(--muted);
+  margin-top: 10px;
+}
+
+.breakdown td {
+  vertical-align: middle;
+}
+
+.bar-cell {
+  width: 40%;
+}
+
+.meter {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.meter-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--primary);
+}
+
+.num {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.timeline {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.timeline li {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.signature {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.signature code {
+  display: block;
+  word-break: break-word;
+  margin: 4px 0;
+}
+
+.clip {
+  max-width: 420px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+h3 {
+  margin: 16px 0 8px;
+}
+
+@media (max-width: 600px) {
+  .topbar nav {
+    gap: 8px;
+    font-size: 0.9rem;
+  }
+  .hero h1 {
+    font-size: 2rem;
+  }
+}

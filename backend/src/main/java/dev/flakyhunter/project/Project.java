@@ -39,6 +39,13 @@ public class Project {
 		this.createdAt = Instant.now();
 	}
 
+	/** The read-only demo project anyone can open without an account. It has no members. */
+	public static Project publicDemo(String slug, String name) {
+		Project demo = new Project(slug, name, "main");
+		demo.publicDemo = true;
+		return demo;
+	}
+
 	public UUID getId() {
 		return id;
 	}

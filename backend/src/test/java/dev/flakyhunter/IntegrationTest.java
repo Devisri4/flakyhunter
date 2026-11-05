@@ -30,7 +30,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 		// tests drive the worker themselves, so results don't depend on scheduler timing
 		"flakyhunter.ingestion.worker-enabled=false",
 		// ...and call maintenance jobs explicitly
-		"flakyhunter.maintenance.initial-delay=24h" })
+		"flakyhunter.maintenance.initial-delay=24h",
+		// tests create small demo projects themselves
+		"flakyhunter.demo.enabled=false" })
 @AutoConfigureMockMvc
 public abstract class IntegrationTest {
 

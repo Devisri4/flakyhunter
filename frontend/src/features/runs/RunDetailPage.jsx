@@ -49,12 +49,14 @@ export function RunDetailPage() {
       </section>
 
       <ResultsSection
+        slug={slug}
         title={`Failed tests (${failed.length})`}
         empty="No failures in this run 🎉"
         results={failed}
         tone="down"
       />
       <ResultsSection
+        slug={slug}
         title={`Passed only after a retry (${flaky.length})`}
         empty="No test needed a retry."
         results={flaky}
@@ -68,7 +70,9 @@ export function RunDetailPage() {
             {slowest.map((r) => (
               <tr key={r.testCaseId}>
                 <td>
-                  <span className="muted">{r.suite} ›</span> {r.name}
+                  <Link to={`/p/${slug}/tests/${r.testCaseId}`}>
+                    <span className="muted">{r.suite} ›</span> {r.name}
+                  </Link>
                 </td>
                 <td>{formatDuration(r.durationMs)}</td>
               </tr>
@@ -98,7 +102,10 @@ function ResultsSection(props) {
         <details key={r.testCaseId} className="result">
           <summary>
             <span className={props.tone}>{props.tone === 'down' ? '✗' : '↻'}</span>{' '}
-            <span className="muted">{r.suite} ›</span> <strong>{r.name}</strong> <StateBadge state={r.state} />
+            <span className="muted">{r.suite} ›</span> <strong>{r.name}</strong> <StateBadge state={r.state} />{' '}
+            <Link to={`/p/${props.slug}/tests/${r.testCaseId}`} className="small" onClick={(e) => e.stopPropagation()}>
+              test history →
+            </Link>
             {r.attempts > 1 && (
               <span className="badge">
                 {r.failedAttempts}/{r.attempts} attempts failed

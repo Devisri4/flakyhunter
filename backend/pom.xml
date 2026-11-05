@@ -28,6 +28,7 @@
 	</scm>
 	<properties>
 		<java.version>25</java.version>
+		<maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -136,6 +137,10 @@
 						<goals>
 							<goal>build-info</goal>
 						</goals>
+						<configuration>
+							<!-- the real build time (the default reproducible-build timestamp is 1980) -->
+							<time>${maven.build.timestamp}</time>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>

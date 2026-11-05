@@ -158,6 +158,35 @@ export function useSignatures(slug, page) {
   })
 }
 
+// --- dashboard & test detail ---
+
+/** KPIs for the last `days` days (7, 30 or 90), with the previous period for comparison. */
+export function useSummary(slug, days) {
+  return useQuery({ queryKey: ['summary', slug, days], queryFn: () => api(`/api/projects/${slug}/summary?days=${days}`) })
+}
+
+/** One point per day: { day, runs, executed, passed, failed, flaky, passRate, avgRunDurationMs }. */
+export function useTrends(slug, days) {
+  return useQuery({ queryKey: ['trends', slug, days], queryFn: () => api(`/api/projects/${slug}/trends?days=${days}`) })
+}
+
+export function useNewlyFlaky(slug) {
+  return useQuery({ queryKey: ['newly-flaky', slug], queryFn: () => api(`/api/projects/${slug}/tests/newly-flaky`) })
+}
+
+/** { test, firstSeen, breakdown, durations, history, signatures } */
+export function useTestDetail(slug, id) {
+  return useQuery({ queryKey: ['test', slug, id], queryFn: () => api(`/api/projects/${slug}/tests/${id}`) })
+}
+
+/** The test's last results, newest first. */
+export function useTestResults(slug, id, limit = 50) {
+  return useQuery({
+    queryKey: ['test-results', slug, id, limit],
+    queryFn: () => api(`/api/projects/${slug}/tests/${id}/results?limit=${limit}`),
+  })
+}
+
 // --- API keys ---
 
 export function useApiKeys(slug) {

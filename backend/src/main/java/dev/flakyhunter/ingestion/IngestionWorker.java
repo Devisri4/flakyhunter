@@ -57,12 +57,24 @@ public class IngestionWorker {
 		}
 	}
 
-	/** Claims and processes one batch; returns how many jobs were claimed. */
+	/**
+	 * Claims and processes one batch; returns how many jobs were claimed. Per project only its oldest queued
+	 * job (by CI run time) is claimed, and none while another job of that project is processing, so each
+	 * test's window is built in run order. Different projects are still processed in parallel.
+	 */
 	public int processAvailable() {
 		List<Claimed> claimed = tx.execute(status -> db.sql("""
 				update ingestion_jobs set status = 'PROCESSING', locked_at = now(), attempts = attempts + 1
-				where id in (select id from ingestion_jobs where status = 'QUEUED'
-				             order by created_at for update skip locked limit :limit)
+				where id in (
+				    select j.id from ingestion_jobs j
+				    where j.status = 'QUEUED'
+				      and not exists (select 1 from ingestion_jobs p
+				                      where p.project_id = j.project_id and p.status = 'PROCESSING')
+				      and not exists (select 1 from ingestion_jobs e
+				                      where e.project_id = j.project_id and e.status = 'QUEUED'
+				                        and (e.triggered_at, e.created_at, e.id) < (j.triggered_at, j.created_at, j.id))
+				    order by j.created_at
+				    for update skip locked limit :limit)
 				returning id, project_id, attempts, commit_sha, branch, ci_provider, build_url, triggered_at""")
 				.param("limit", props.batchSize())
 				.query(Claimed.class).list());

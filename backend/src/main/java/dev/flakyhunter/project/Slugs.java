@@ -2,6 +2,7 @@ package dev.flakyhunter.project;
 
 import java.text.Normalizer;
 import java.util.Locale;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /** Project slugs: 3–40 chars of a–z, 0–9 and inner hyphens, e.g. "acme-shop". */
@@ -23,8 +24,16 @@ final class Slugs {
 		return slug;
 	}
 
+	/** Names users can't take: the public demo lives at /p/demo, the rest could clash with future pages. */
+	static final Set<String> RESERVED = Set.of("demo", "new", "admin", "api", "settings", "projects", "login",
+			"signup", "setup");
+
 	static boolean isValid(String slug) {
 		return slug != null && VALID.matcher(slug).matches() && !slug.contains("--");
+	}
+
+	static boolean isReserved(String slug) {
+		return RESERVED.contains(slug);
 	}
 
 }

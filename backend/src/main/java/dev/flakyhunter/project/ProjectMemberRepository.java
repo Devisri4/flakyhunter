@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 interface ProjectMemberRepository extends JpaRepository<ProjectMember, ProjectMember.Key> {
 
 	@Query("""
-			select new dev.flakyhunter.project.ProjectSummary(p.slug, p.name, p.defaultBranch, m.role, p.createdAt)
+			select new dev.flakyhunter.project.ProjectSummary(p.slug, p.name, p.defaultBranch, m.role, p.createdAt, p.publicDemo)
 			from ProjectMember m join Project p on p.id = m.id.projectId
 			where m.id.userId = :userId
 			order by lower(p.name)""")

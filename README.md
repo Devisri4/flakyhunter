@@ -25,9 +25,14 @@ groups failures by root cause, and lets teams quarantine bad tests so they stop 
 
 ## Run the backend locally
 
+The backend needs a PostgreSQL database (it uses Postgres features such as `FOR UPDATE SKIP LOCKED`,
+advisory locks and arrays, so H2 can't stand in). The easiest option is a free Neon **dev branch**.
+Set the variables from [.env.example](.env.example) in your shell, then:
+
 ```bash
 cd backend
 mvn spring-boot:run
 ```
 
-Configuration comes from environment variables — see [.env.example](.env.example).
+Tests: `mvn test` runs the unit tests anywhere; the integration tests use Testcontainers and run
+automatically when Docker is available (they always run in GitHub Actions).

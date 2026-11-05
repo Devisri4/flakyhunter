@@ -56,9 +56,13 @@ public class FlakinessScorer {
 
 	}
 
-	/** Everything the UI shows to explain a verdict. */
+	/**
+	 * Everything the UI shows to explain a verdict: the raw signals (0–1) and how many score points each one
+	 * contributed after weighting ({@code retryPart + flipPart + commitPart = score}, capped at 1).
+	 */
 	public record Stats(int runsInWindow, int flipCount, int retryPassCount, int failStreak, double retrySignal,
-			double flipSignal, double commitSignal, BigDecimal score, TestState state) {
+			double flipSignal, double commitSignal, double retryPart, double flipPart, double commitPart,
+			BigDecimal score, TestState state) {
 	}
 
 	public Stats score(Window window) {
@@ -79,11 +83,14 @@ public class FlakinessScorer {
 		double r = n == 0 ? 0 : (double) retryPasses / n;
 		double f = n < 2 ? 0 : (double) flips / (n - 1);
 		double c = commitSignal(window);
-		double raw = props.retryWeight() * Math.min(1, 2 * r) + props.flipWeight() * Math.min(1, 2 * f)
-				+ props.commitWeight() * c;
-		BigDecimal score = BigDecimal.valueOf(Math.min(1, raw)).setScale(3, RoundingMode.HALF_UP);
+		double retryPart = props.retryWeight() * Math.min(1, 2 * r);
+		double flipPart = props.flipWeight() * Math.min(1, 2 * f);
+		double commitPart = props.commitWeight() * c;
+		BigDecimal score = BigDecimal.valueOf(Math.min(1, retryPart + flipPart + commitPart))
+				.setScale(3, RoundingMode.HALF_UP);
 
-		return new Stats(n, flips, retryPasses, failStreak, r, f, c, score, state(w, score, failStreak));
+		return new Stats(n, flips, retryPasses, failStreak, r, f, c, retryPart, flipPart, commitPart, score,
+				state(w, score, failStreak));
 	}
 
 	/** The rules of ADR-0004, evaluated in order. */
@@ -151,6 +158,10 @@ public class FlakinessScorer {
 
 	public int windowSize() {
 		return props.windowSize();
+	}
+
+	public ScoringProperties settings() {
+		return props;
 	}
 
 }

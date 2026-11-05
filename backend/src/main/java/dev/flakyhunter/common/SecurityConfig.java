@@ -6,6 +6,7 @@ import dev.flakyhunter.project.ApiKeyService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -45,6 +46,9 @@ public class SecurityConfig {
 				// Health and info are public: the website and the keep-alive ping read them without logging in.
 				.requestMatchers("/api/actuator/health/**", "/api/actuator/info").permitAll()
 				.requestMatchers(PUBLIC_AUTH).permitAll()
+				// Reading one project's data may be anonymous: ProjectAccess allows that only for the public demo
+				// and answers 401 for everything else. (The project list, /api/projects, still needs a login.)
+				.requestMatchers(HttpMethod.GET, "/api/projects/*", "/api/projects/*/**").permitAll()
 				.anyRequest().authenticated())
 				.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				// SPA mode: XSRF-TOKEN cookie readable by JS, echoed back in the X-XSRF-TOKEN header.

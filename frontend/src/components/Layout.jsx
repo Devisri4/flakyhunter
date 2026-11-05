@@ -1,5 +1,6 @@
-import { Link, Navigate, Outlet, useLocation, useNavigate } from 'react-router'
-import { useLogout, useMe } from '../api/hooks'
+import { Link, Navigate, Outlet, useLocation, useNavigate, useParams } from 'react-router'
+import { useLogout, useMe, useProject } from '../api/hooks'
+import { Skeleton } from './Skeleton'
 
 export function Layout() {
   const me = useMe()
@@ -30,6 +31,7 @@ export function Layout() {
           ) : (
             !me.isLoading && (
               <>
+                <Link to="/p/demo">Demo</Link>
                 <Link to="/login">Log in</Link>
                 <Link to="/signup" className="button">
                   Sign up
@@ -44,6 +46,22 @@ export function Layout() {
       </main>
     </>
   )
+}
+
+/**
+ * Project pages work without a login when the project is the public demo. For any other project, a visitor
+ * who isn't logged in is sent to /login and comes back afterwards.
+ */
+export function ProjectGate() {
+  const { slug = '' } = useParams()
+  const me = useMe()
+  const project = useProject(slug)
+  const location = useLocation()
+  if (me.isLoading || project.isLoading) return <Skeleton height={320} />
+  if (project.error?.status === 401 && !me.data) {
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />
+  }
+  return <Outlet />
 }
 
 /** Pages inside need a logged-in user; others are sent to /login and come back afterwards. */

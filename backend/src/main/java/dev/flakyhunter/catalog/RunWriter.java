@@ -51,7 +51,7 @@ public class RunWriter {
 			Map<String, Long> caseIds = upsertCases(projectId, meta, chunk);
 			Map<Integer, Long> signatureIds = upsertSignatures(projectId, meta, chunk);
 			insertResults(runId, chunk, caseIds, signatureIds);
-			stats.apply(runId, commit, observations(chunk, caseIds));
+			stats.apply(runId, commit, meta.triggeredAt(), observations(chunk, caseIds));
 		}
 		return runId;
 	}

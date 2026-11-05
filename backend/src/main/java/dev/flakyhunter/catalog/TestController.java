@@ -18,10 +18,23 @@ class TestController {
 
 	private final ProjectAccess access;
 	private final TestQueries tests;
+	private final TestDetailQueries details;
 
-	TestController(ProjectAccess access, TestQueries tests) {
+	TestController(ProjectAccess access, TestQueries tests, TestDetailQueries details) {
 		this.access = access;
 		this.tests = tests;
+		this.details = details;
+	}
+
+	@GetMapping("/tests/{id:\\d+}")
+	TestDetailQueries.TestDetail detail(@PathVariable String slug, @PathVariable long id) {
+		return details.detail(access.require(slug, Role.VIEWER).project().getId(), id);
+	}
+
+	@GetMapping("/tests/{id:\\d+}/results")
+	java.util.List<TestDetailQueries.TestResult> results(@PathVariable String slug, @PathVariable long id,
+			@RequestParam(defaultValue = "50") int limit) {
+		return details.results(access.require(slug, Role.VIEWER).project().getId(), id, Math.clamp(limit, 1, 200));
 	}
 
 	@GetMapping("/tests")

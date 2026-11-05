@@ -179,6 +179,23 @@ class IngestionFlowTests extends IntegrationTest {
 	}
 
 	@Test
+	void oneProjectsJobsAreProcessedOneAtATimeInRunOrder() throws Exception {
+		// uploaded newest-first, but they must be applied oldest-first
+		String late = upload(apiKey, req -> req.file(report("gradle.xml")).param("triggeredAt", "2026-10-03T10:00:00Z"));
+		String middle = upload(apiKey, req -> req.file(report("gradle.xml")).param("triggeredAt", "2026-10-02T10:00:00Z"));
+		String early = upload(apiKey, req -> req.file(report("gradle.xml")).param("triggeredAt", "2026-10-01T10:00:00Z"));
+
+		assertThat(worker.processAvailable()).isEqualTo(1); // only one job of this project per round
+		assertThat(jobStatus(early)).isEqualTo("DONE");
+		assertThat(jobStatus(middle)).isEqualTo("QUEUED");
+		assertThat(jobStatus(late)).isEqualTo("QUEUED");
+
+		assertThat(worker.processAvailable()).isEqualTo(1);
+		assertThat(jobStatus(middle)).isEqualTo("DONE");
+		assertThat(awaitJob(late)).isEqualTo("DONE");
+	}
+
+	@Test
 	void uploadWithoutFilesIs400() throws Exception {
 		mvc.perform(multipart("/api/v1/ingest").param("branch", "main").header("X-Api-Key", apiKey))
 				.andExpect(status().isBadRequest());
@@ -197,6 +214,11 @@ class IngestionFlowTests extends IntegrationTest {
 				.andExpect(status().isAccepted())
 				.andReturn().getResponse().getContentAsString();
 		return JsonPath.read(body, "$.jobId");
+	}
+
+	private String jobStatus(String jobId) throws Exception {
+		return JsonPath.read(mvc.perform(get("/api/v1/ingest/jobs/" + jobId).header("X-Api-Key", apiKey))
+				.andReturn().getResponse().getContentAsString(), "$.status");
 	}
 
 	/** Runs the worker until the job is finished; returns DONE or FAILED. */

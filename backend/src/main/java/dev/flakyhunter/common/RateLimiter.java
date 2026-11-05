@@ -22,6 +22,7 @@ public class RateLimiter {
 	@ConfigurationProperties("flakyhunter.rate-limits")
 	public record Limits(
 			@DefaultValue("10") int loginPerMinute,
+			@DefaultValue("30") int loginPerEmailPer15Minutes,
 			@DefaultValue("20") int signupPerHour,
 			@DefaultValue("30") int ingestPerMinute) {
 	}

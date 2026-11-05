@@ -22,6 +22,7 @@ export function LandingPage() {
           Flaky<span className="accent">Hunter</span>
         </h1>
         <p>Send your CI test results, find the flaky tests, quarantine them so they stop blocking builds.</p>
+        <p className="muted small">The demo needs no account: a fictional shop with 60 days of CI runs.</p>
         <div className="row center">
           {me.data ? (
             <Link to="/projects" className="button">
@@ -29,11 +30,11 @@ export function LandingPage() {
             </Link>
           ) : (
             <>
-              <Link to="/signup" className="button">
-                Create a free account
+              <Link to="/p/demo" className="button">
+                View live demo
               </Link>
-              <Link to="/login" className="button ghost">
-                Log in
+              <Link to="/signup" className="button ghost">
+                Create a free account
               </Link>
             </>
           )}

@@ -1,5 +1,6 @@
 package dev.flakyhunter.common;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.security.core.Authentication;
@@ -13,11 +14,16 @@ public final class CurrentUser {
 	}
 
 	public static UUID id() {
+		return optionalId().orElseThrow(() -> ApiException.unauthorized("Login required"));
+	}
+
+	/** Empty for anonymous visitors (e.g. someone looking at the public demo). */
+	public static Optional<UUID> optionalId() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth instanceof JwtAuthenticationToken jwt) {
-			return UUID.fromString(jwt.getName());
+			return Optional.of(UUID.fromString(jwt.getName()));
 		}
-		throw ApiException.unauthorized("Login required");
+		return Optional.empty();
 	}
 
 }

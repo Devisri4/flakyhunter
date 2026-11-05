@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatDuration, passRate, shortSha } from './format'
+import { change, formatDuration, passRate, shortSha } from './format'
 
 describe('format', () => {
   it('formats durations', () => {
@@ -14,8 +14,20 @@ describe('format', () => {
     expect(passRate({ passed: 0, failed: 0, flaky: 0 })).toBeNull()
   })
 
-  it('shortens commit SHAs', () => {
+  it('shortens real commit SHAs but keeps other labels whole', () => {
     expect(shortSha('abc1234def')).toBe('abc1234')
+    expect(shortSha('3ddc48e8f2a14b0c9d7e6f5a4b3c2d1e0f9a8b7c')).toBe('3ddc48e')
+    expect(shortSha('sample10')).toBe('sample10')
+    expect(shortSha('release-2.1')).toBe('release-2.1')
     expect(shortSha(null)).toBe('—')
+  })
+})
+
+describe('change', () => {
+  it('describes the difference to the previous period', () => {
+    expect(change(97.5, 95)).toBe('+2.5 pts')
+    expect(change(90, 91)).toBe('−1 pts')
+    expect(change(90, 90)).toBe('±0 pts')
+    expect(change(90, null)).toBeNull()
   })
 })
