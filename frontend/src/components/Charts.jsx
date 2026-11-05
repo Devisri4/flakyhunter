@@ -27,12 +27,15 @@ function ChartTooltip({ active, payload, label, format, labelFormat }) {
 
 /** A line over time. `data` rows need `x` and the `dataKey`; null values leave a gap (e.g. days without runs). */
 export function TrendLine({ data, dataKey, format, domain = ['auto', 'auto'], height = 180, labelFormat = shortDay }) {
+  // with only a few values (or gaps between them) a bare line is invisible, so draw a dot on each value
+  const values = data.filter((d) => d[dataKey] !== null && d[dataKey] !== undefined).length
+  const dot = values <= 12 ? { r: 3, fill: 'var(--primary)', stroke: 'var(--card)', strokeWidth: 1.5 } : false
   return (
     <ResponsiveContainer width="100%" height={height}>
       <LineChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: 0 }}>
         <CartesianGrid stroke="var(--border)" strokeDasharray="0" vertical={false} />
         <XAxis dataKey="x" tickFormatter={labelFormat} minTickGap={24} {...AXIS} />
-        <YAxis domain={domain} tickFormatter={format} width={48} axisLine={false} {...AXIS} />
+        <YAxis domain={domain} allowDecimals={false} tickFormatter={format} width={48} axisLine={false} {...AXIS} />
         <Tooltip
           content={<ChartTooltip format={format} labelFormat={labelFormat} />}
           cursor={{ stroke: 'var(--muted)', strokeWidth: 1 }}
@@ -42,7 +45,7 @@ export function TrendLine({ data, dataKey, format, domain = ['auto', 'auto'], he
           dataKey={dataKey}
           stroke="var(--primary)"
           strokeWidth={2}
-          dot={false}
+          dot={dot}
           activeDot={{ r: 4, stroke: 'var(--card)', strokeWidth: 2 }}
           connectNulls={false}
           isAnimationActive={false}

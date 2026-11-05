@@ -56,7 +56,11 @@ function Kpis({ slug, days }) {
         hint="Tests whose current verdict is FLAKY"
         tone={s.flakyTests > 0 ? 'flaky' : undefined}
       />
-      <Kpi label="Runs per day" value={String(s.runsPerDay)} delta={`${s.runs} runs in ${days} days`} />
+      <Kpi
+        label="Runs per day"
+        value={s.runs > 0 && s.runsPerDay < 0.1 ? '<0.1' : String(s.runsPerDay)}
+        delta={`${s.runs} run${s.runs === 1 ? '' : 's'} in ${days} days`}
+      />
       <Kpi
         label="Avg run duration"
         value={s.avgRunDurationMs === null ? '—' : formatDuration(s.avgRunDurationMs)}
@@ -77,7 +81,12 @@ function Trends({ slug, days }) {
     <div className="grid-2">
       <section className="card">
         <h2>Pass rate per day</h2>
-        <TrendLine data={data} dataKey="passRate" format={(v) => `${v}%`} domain={['auto', 100]} />
+        <TrendLine
+          data={data}
+          dataKey="passRate"
+          format={(v) => `${v}%`}
+          domain={[(min) => Math.max(0, Math.floor(min - 1)), 100]}
+        />
       </section>
       <section className="card">
         <h2>Runs per day</h2>

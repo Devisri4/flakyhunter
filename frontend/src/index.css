@@ -921,7 +921,7 @@ code.key {
 
 .features {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  grid-template-columns: repeat(3, 1fr); /* 6 cards = 2 even rows */
   gap: 16px;
   margin: 8px 0 28px;
 }
@@ -1062,6 +1062,18 @@ code.key {
 }
 
 /* --- small screens --- */
+
+@media (max-width: 900px) {
+  .features {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .features {
+    grid-template-columns: 1fr;
+  }
+}
 
 @media (max-width: 760px) {
   .auth-shell {
