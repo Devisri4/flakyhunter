@@ -28,7 +28,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 		// every test signs up users from 127.0.0.1
 		"flakyhunter.rate-limits.signup-per-hour=100000",
 		// tests drive the worker themselves, so results don't depend on scheduler timing
-		"flakyhunter.ingestion.worker-enabled=false" })
+		"flakyhunter.ingestion.worker-enabled=false",
+		// ...and call maintenance jobs explicitly
+		"flakyhunter.maintenance.initial-delay=24h" })
 @AutoConfigureMockMvc
 public abstract class IntegrationTest {
 

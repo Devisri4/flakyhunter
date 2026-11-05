@@ -22,8 +22,10 @@ public class RunQueries {
 			OffsetDateTime triggeredAt, long durationMs, int total, int passed, int failed, int skipped, int flaky) {
 	}
 
+	/** One result in a run; {@code state} is the test's current verdict (FLAKY, BROKEN, ...). */
 	public record ResultView(long testCaseId, String suite, String name, String file, String outcome, int attempts,
-			int failedAttempts, long durationMs, String failureType, String message, String stack) {
+			int failedAttempts, long durationMs, String failureType, String message, String stack, String state,
+			Long signatureId) {
 	}
 
 	public record RunDetail(RunSummary run, List<ResultView> failed, List<ResultView> flaky, List<ResultView> slowest) {
@@ -75,7 +77,7 @@ public class RunQueries {
 	private List<ResultView> results(long runId, String where, String orderBy, int limit) {
 		return db.sql("""
 				select c.id as test_case_id, c.suite, c.name, c.file, r.outcome, r.attempts, r.failed_attempts,
-				       r.duration_ms, r.failure_type, r.message, r.stack
+				       r.duration_ms, r.failure_type, r.message, r.stack, c.state, r.signature_id
 				from test_results r join test_cases c on c.id = r.test_case_id
 				where r.run_id = :run and %s
 				order by %s limit %d""".formatted(where, orderBy, limit))
