@@ -11,7 +11,7 @@ describe('readCookie', () => {
   })
 })
 
-function response(status: number, body?: unknown): Response {
+function response(status, body) {
   return new Response(body === undefined ? null : JSON.stringify(body), { status })
 }
 
@@ -46,10 +46,10 @@ describe('api', () => {
     vi.stubGlobal('fetch', fetchMock)
     vi.stubGlobal('document', { cookie: '' })
 
-    const error = await api('/api/projects').catch((e: unknown) => e)
+    const error = await api('/api/projects').catch((e) => e)
     expect(error).toBeInstanceOf(ApiError)
-    expect((error as ApiError).status).toBe(401)
-    expect((error as ApiError).message).toBe('Login required')
+    expect(error.status).toBe(401)
+    expect(error.message).toBe('Login required')
   })
 
   it('sends the CSRF header on POST', async () => {

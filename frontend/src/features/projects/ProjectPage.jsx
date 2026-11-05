@@ -1,13 +1,13 @@
 import { Link, useParams } from 'react-router'
-import { useProject, useRuns, useTests, useTestSummary, useUploads, type TestState } from '../../api/hooks'
+import { useProject, useRuns, useTests, useTestSummary, useUploads } from '../../api/hooks'
 import { OutcomeStrip, StateBadge, STATE_INFO } from '../../components/TestBadges'
 import { formatDateTime } from '../../lib/format'
 import { RunsTable } from '../runs/RunsTable'
 
-const HEALTH_ORDER: TestState[] = ['FLAKY', 'BROKEN', 'SUSPECT', 'STABLE', 'NEW']
+const HEALTH_ORDER = ['FLAKY', 'BROKEN', 'SUSPECT', 'STABLE', 'NEW']
 
 /** Counts per state (each links to the filtered test list) and the most flaky tests. */
-function TestHealth({ slug }: { slug: string }) {
+function TestHealth({ slug }) {
   const summary = useTestSummary(slug)
   const flaky = useTests(slug, { state: 'FLAKY', size: 5 })
   if (!summary.data) return null
@@ -62,7 +62,7 @@ export function ProjectPage() {
 
   if (project.isLoading) return <p className="muted">Loading…</p>
   if (project.error) return <p className="error">{project.error.message}</p>
-  const p = project.data!
+  const p = project.data
   const pending = uploads.data?.filter((u) => u.status === 'QUEUED' || u.status === 'PROCESSING') ?? []
   const failedUploads = uploads.data?.filter((u) => u.status === 'FAILED').slice(0, 3) ?? []
 

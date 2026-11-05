@@ -1,7 +1,5 @@
-import type { TestState } from '../api/hooks'
-
 /** Colour + icon + word, so the state never depends on colour alone. */
-export const STATE_INFO: Record<TestState, { icon: string; label: string; hint: string }> = {
+export const STATE_INFO = {
   FLAKY: { icon: '↯', label: 'Flaky', hint: 'Passes and fails without a code change' },
   BROKEN: { icon: '✗', label: 'Broken', hint: 'Failed in each of the last runs: a real bug' },
   SUSPECT: { icon: '?', label: 'Suspect', hint: 'Weak flaky signal: worth watching' },
@@ -9,7 +7,7 @@ export const STATE_INFO: Record<TestState, { icon: string; label: string; hint: 
   NEW: { icon: '•', label: 'New', hint: 'Not enough runs yet for a verdict' },
 }
 
-export function StateBadge({ state }: { state: TestState }) {
+export function StateBadge({ state }) {
   const info = STATE_INFO[state]
   return (
     <span className={`state state-${state.toLowerCase()}`} title={info.hint}>
@@ -18,10 +16,10 @@ export function StateBadge({ state }: { state: TestState }) {
   )
 }
 
-const OUTCOME_LABEL: Record<string, string> = { P: 'passed', F: 'failed', R: 'passed after a retry' }
+const OUTCOME_LABEL = { P: 'passed', F: 'failed', R: 'passed after a retry' }
 
 /** One small square per recent run, oldest on the left. */
-export function OutcomeStrip({ outcomes }: { outcomes: string }) {
+export function OutcomeStrip({ outcomes }) {
   if (!outcomes) return <span className="muted">no runs yet</span>
   return (
     <span className="strip" role="img" aria-label={`Last ${outcomes.length} runs, oldest first: ${[...outcomes].map((c) => OUTCOME_LABEL[c]).join(', ')}`}>

@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router'
-import { useRun, type ResultView } from '../../api/hooks'
+import { useRun } from '../../api/hooks'
 import { formatDateTime, formatDuration, passRate, shortSha } from '../../lib/format'
 import { RunCounts } from './RunsTable'
 import { StateBadge } from '../../components/TestBadges'
@@ -10,7 +10,7 @@ export function RunDetailPage() {
 
   if (detail.isLoading) return <p className="muted">Loading…</p>
   if (detail.error) return <p className="error">{detail.error.message}</p>
-  const { run, failed, flaky, slowest } = detail.data!
+  const { run, failed, flaky, slowest } = detail.data
   const rate = passRate(run)
 
   return (
@@ -80,7 +80,7 @@ export function RunDetailPage() {
   )
 }
 
-function Stat({ label, value, tone }: { label: string; value: string; tone?: 'up' | 'down' | 'flaky' }) {
+function Stat({ label, value, tone }) {
   return (
     <div className="stat">
       <span className="muted">{label}</span>
@@ -89,7 +89,7 @@ function Stat({ label, value, tone }: { label: string; value: string; tone?: 'up
   )
 }
 
-function ResultsSection(props: { title: string; empty: string; results: ResultView[]; tone: 'down' | 'flaky' }) {
+function ResultsSection(props) {
   return (
     <section className="card">
       <h2>{props.title}</h2>

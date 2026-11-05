@@ -1,9 +1,8 @@
 import { Link } from 'react-router'
-import type { RunSummary } from '../../api/hooks'
 import { formatDateTime, formatDuration, passRate, shortSha } from '../../lib/format'
 
 /** Totals as small coloured counts: ✓ passed, ✗ failed, ↻ flaky (passed on retry), ⤼ skipped. */
-export function RunCounts({ run }: { run: RunSummary }) {
+export function RunCounts({ run }) {
   return (
     <span className="counts">
       <span className="up" title="passed">✓ {run.passed}</span>
@@ -14,7 +13,7 @@ export function RunCounts({ run }: { run: RunSummary }) {
   )
 }
 
-export function RunsTable({ slug, runs }: { slug: string; runs: RunSummary[] }) {
+export function RunsTable({ slug, runs }) {
   return (
     <table>
       <thead>

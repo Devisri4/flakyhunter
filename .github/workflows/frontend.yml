@@ -21,6 +21,6 @@ jobs:
           node-version: '22'
       # No package-lock.json yet (no Node on the dev laptop), so `npm install` instead of `npm ci`.
       - run: npm install
-      - run: npm run typecheck
+      - run: npm run lint
       - run: npm test
       - run: npm run build

@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { useCreateProject, useProjects } from '../../api/hooks'
 
@@ -8,7 +8,7 @@ export function ProjectsPage() {
   const navigate = useNavigate()
   const [name, setName] = useState('')
 
-  function submit(e: FormEvent) {
+  function submit(e) {
     e.preventDefault()
     create.mutate({ name }, { onSuccess: (p) => navigate(`/p/${p.slug}/settings`) })
   }

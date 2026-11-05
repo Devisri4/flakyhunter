@@ -1,16 +1,16 @@
-import { useState, type FormEvent } from 'react'
+import { useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router'
-import { useTests, type TestState } from '../../api/hooks'
+import { useTests } from '../../api/hooks'
 import { OutcomeStrip, StateBadge, STATE_INFO } from '../../components/TestBadges'
 import { formatDateTime } from '../../lib/format'
 
-const STATES: TestState[] = ['FLAKY', 'BROKEN', 'SUSPECT', 'STABLE', 'NEW']
+const STATES = ['FLAKY', 'BROKEN', 'SUSPECT', 'STABLE', 'NEW']
 const PAGE_SIZE = 25
 
 export function TestsPage() {
   const { slug = '' } = useParams()
   const [params, setParams] = useSearchParams()
-  const state = (params.get('state') ?? '') as TestState | ''
+  const state = params.get('state') ?? ''
   const q = params.get('q') ?? ''
   const sort = params.get('sort') ?? 'score'
   const page = Number(params.get('page') ?? 0)
@@ -18,14 +18,14 @@ export function TestsPage() {
   const tests = useTests(slug, { state, q, sort, page, size: PAGE_SIZE })
   const totalPages = tests.data ? Math.max(1, Math.ceil(tests.data.totalElements / PAGE_SIZE)) : 1
 
-  function update(changes: Record<string, string>) {
+  function update(changes) {
     const next = new URLSearchParams(params)
     Object.entries(changes).forEach(([k, v]) => (v ? next.set(k, v) : next.delete(k)))
     if (!('page' in changes)) next.delete('page')
     setParams(next)
   }
 
-  function submit(e: FormEvent) {
+  function submit(e) {
     e.preventDefault()
     update({ q: search })
   }

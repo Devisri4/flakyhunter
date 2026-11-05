@@ -12,7 +12,7 @@ groups failures by root cause, and lets teams quarantine bad tests so they stop 
 ## Tech stack
 
 - **Backend:** Java 25, Spring Boot 4, PostgreSQL (Neon), Flyway — hosted on Render
-- **Frontend:** React + TypeScript + Vite — hosted on Vercel
+- **Frontend:** React (JavaScript) + Vite — hosted on Vercel
 - **CI:** GitHub Actions
 
 ## Repository layout

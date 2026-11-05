@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router'
 
 const API_URL = `${window.location.origin}/api/v1/ingest`
 
-function Snippet({ title, code }: { title: string; code: string }) {
+function Snippet({ title, code }) {
   const [copied, setCopied] = useState(false)
   return (
     <div className="snippet">

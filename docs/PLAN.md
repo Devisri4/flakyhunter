@@ -106,7 +106,7 @@ in production. (ADR-0003)
 | Auth | Spring Security, **JWT in httpOnly cookies** (access 15 min + rotating refresh 7 days) | BCrypt passwords; CSRF token cookie for SPA |
 | API docs | **springdoc-openapi** → Swagger UI at `/api/docs` | Recruiters can click through the API |
 | Rate limiting | **Bucket4j** (in-memory) | Ingest endpoint per API key |
-| Frontend | **React + TypeScript + Vite**, Tailwind CSS, React Router | |
+| Frontend | **React + JavaScript (JSX) + Vite**, React Router, ESLint | Converted from TypeScript on 2026-11-05 at the owner's request; plain CSS (no Tailwind) |
 | Data fetching | **TanStack Query** | Caching, pagination, background refresh |
 | Charts | **Recharts** | Trends, duration charts, outcome heatmap |
 | Forms | react-hook-form + zod | |
@@ -140,7 +140,7 @@ flakyhunter/
 │   │   └── resources/reports/   sample JUnit XML / Playwright JSON fixtures
 │   └── Dockerfile
 ├── frontend/                    React + TS + Vite
-│   └── src/{api,features,components,routes,lib}
+│   └── src/{api,features,components,lib} (.js / .jsx)
 ├── junit5-extension/            (V1) flakyhunter-junit5 library
 ├── e2e/                         Playwright tests against the deployed app
 ├── examples/                    sample reports + GitHub Action usage

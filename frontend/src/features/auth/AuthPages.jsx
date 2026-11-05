@@ -1,11 +1,11 @@
-import { useState, type FormEvent } from 'react'
+import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router'
 import { useLogin, useSignup } from '../../api/hooks'
 
 function useAfterLogin() {
   const navigate = useNavigate()
   const location = useLocation()
-  const from = (location.state as { from?: string } | null)?.from ?? '/projects'
+  const from = location.state?.from ?? '/projects'
   return () => navigate(from, { replace: true })
 }
 
@@ -15,7 +15,7 @@ export function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
-  function submit(e: FormEvent) {
+  function submit(e) {
     e.preventDefault()
     login.mutate({ email, password }, { onSuccess: done })
   }
@@ -55,7 +55,7 @@ export function SignupPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
-  function submit(e: FormEvent) {
+  function submit(e) {
     e.preventDefault()
     signup.mutate({ displayName, email, password }, { onSuccess: done })
   }

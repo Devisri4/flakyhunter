@@ -5,13 +5,13 @@ import { describeHealth, fetchHealth } from '../../health'
 
 export function LandingPage() {
   const me = useMe()
-  const [lines, setLines] = useState<string[] | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [lines, setLines] = useState(null)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     fetchHealth()
       .then((health) => setLines(describeHealth(health)))
-      .catch((e: Error) => setError(e.message))
+      .catch((e) => setError(e.message))
   }, [])
 
   return (

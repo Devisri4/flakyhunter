@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 import {
   useAddMember,
@@ -11,12 +11,11 @@ import {
   useProject,
   useRemoveMember,
   useRevokeApiKey,
-  type Role,
 } from '../../api/hooks'
 
-const ROLES: Role[] = ['OWNER', 'MEMBER', 'VIEWER']
+const ROLES = ['OWNER', 'MEMBER', 'VIEWER']
 
-function formatDate(iso: string | null) {
+function formatDate(iso) {
   return iso ? new Date(iso).toLocaleString() : '—'
 }
 
@@ -26,30 +25,30 @@ export function SettingsPage() {
 
   if (project.isLoading) return <p className="muted">Loading…</p>
   if (project.error) return <p className="error">{project.error.message}</p>
-  if (project.data!.role !== 'OWNER') return <p className="error">Only project owners can open settings.</p>
+  if (project.data.role !== 'OWNER') return <p className="error">Only project owners can open settings.</p>
 
   return (
     <>
       <p>
-        <Link to={`/p/${slug}`}>← {project.data!.name}</Link>
+        <Link to={`/p/${slug}`}>← {project.data.name}</Link>
       </p>
       <h1>Settings</h1>
       <ApiKeysSection slug={slug} />
       <MembersSection slug={slug} />
-      <DangerZone slug={slug} name={project.data!.name} />
+      <DangerZone slug={slug} name={project.data.name} />
     </>
   )
 }
 
-function ApiKeysSection({ slug }: { slug: string }) {
+function ApiKeysSection({ slug }) {
   const keys = useApiKeys(slug)
   const create = useCreateApiKey(slug)
   const revoke = useRevokeApiKey(slug)
   const [name, setName] = useState('')
-  const [newKey, setNewKey] = useState<string | null>(null)
+  const [newKey, setNewKey] = useState(null)
   const [copied, setCopied] = useState(false)
 
-  function submit(e: FormEvent) {
+  function submit(e) {
     e.preventDefault()
     create.mutate(name, {
       onSuccess: (result) => {
@@ -141,16 +140,16 @@ function ApiKeysSection({ slug }: { slug: string }) {
   )
 }
 
-function MembersSection({ slug }: { slug: string }) {
+function MembersSection({ slug }) {
   const me = useMe()
   const members = useMembers(slug)
   const add = useAddMember(slug)
   const changeRole = useChangeRole(slug)
   const remove = useRemoveMember(slug)
   const [email, setEmail] = useState('')
-  const [role, setRole] = useState<Role>('MEMBER')
+  const [role, setRole] = useState('MEMBER')
 
-  function submit(e: FormEvent) {
+  function submit(e) {
     e.preventDefault()
     add.mutate({ email, role }, { onSuccess: () => setEmail('') })
   }
@@ -169,7 +168,7 @@ function MembersSection({ slug }: { slug: string }) {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-        <select value={role} onChange={(e) => setRole(e.target.value as Role)}>
+        <select value={role} onChange={(e) => setRole(e.target.value)}>
           {ROLES.map((r) => (
             <option key={r}>{r}</option>
           ))}
@@ -191,7 +190,7 @@ function MembersSection({ slug }: { slug: string }) {
               <td>
                 <select
                   value={m.role}
-                  onChange={(e) => changeRole.mutate({ userId: m.userId, role: e.target.value as Role })}
+                  onChange={(e) => changeRole.mutate({ userId: m.userId, role: e.target.value })}
                 >
                   {ROLES.map((r) => (
                     <option key={r}>{r}</option>
@@ -214,7 +213,7 @@ function MembersSection({ slug }: { slug: string }) {
   )
 }
 
-function DangerZone({ slug, name }: { slug: string; name: string }) {
+function DangerZone({ slug, name }) {
   const del = useDeleteProject(slug)
   const navigate = useNavigate()
 
