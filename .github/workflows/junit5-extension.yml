@@ -16,7 +16,7 @@ jobs:
         working-directory: junit5-extension
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: '17' # the oldest Java the library supports
