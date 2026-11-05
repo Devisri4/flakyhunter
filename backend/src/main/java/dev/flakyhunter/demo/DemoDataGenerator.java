@@ -79,10 +79,13 @@ public class DemoDataGenerator {
 		long nowSlot = now.getEpochSecond() / slotSeconds;
 		long oldestSlot = nowSlot - (long) days * runsPerDay + 1;
 
-		OffsetDateTime last = db.sql("select max(triggered_at) from test_runs where project_id = :p")
-				.param("p", projectId).query(OffsetDateTime.class).single();
-		OffsetDateTime first = db.sql("select min(triggered_at) from test_runs where project_id = :p")
-				.param("p", projectId).query(OffsetDateTime.class).single();
+		// a brand-new demo has no runs yet: both are null then
+		OffsetDateTime last = db.sql("""
+				select triggered_at from test_runs where project_id = :p order by triggered_at desc limit 1""")
+				.param("p", projectId).query(OffsetDateTime.class).optional().orElse(null);
+		OffsetDateTime first = db.sql("""
+				select triggered_at from test_runs where project_id = :p order by triggered_at limit 1""")
+				.param("p", projectId).query(OffsetDateTime.class).optional().orElse(null);
 		long fromSlot = last == null ? oldestSlot : Math.max(oldestSlot, last.toEpochSecond() / slotSeconds + 1);
 		long firstSlot = first == null ? fromSlot : first.toEpochSecond() / slotSeconds;
 		// NEW tests show up in the runs just before the demo was first created
