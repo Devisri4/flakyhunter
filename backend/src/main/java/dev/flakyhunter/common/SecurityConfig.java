@@ -47,7 +47,7 @@ public class SecurityConfig {
 				.requestMatchers("/api/actuator/health/**", "/api/actuator/info").permitAll()
 				.requestMatchers(PUBLIC_AUTH).permitAll()
 				// Swagger UI and the OpenAPI description are public documentation
-				.requestMatchers("/api/docs", "/api/docs/**", "/swagger-ui/**").permitAll()
+				.requestMatchers("/api/docs", "/api/docs/**", "/api/swagger-ui/**", "/swagger-ui/**").permitAll()
 				// Reading one project's data may be anonymous: ProjectAccess allows that only for the public demo
 				// and answers 401 for everything else. (The project list, /api/projects, still needs a login.)
 				.requestMatchers(HttpMethod.GET, "/api/projects/*", "/api/projects/*/**").permitAll()

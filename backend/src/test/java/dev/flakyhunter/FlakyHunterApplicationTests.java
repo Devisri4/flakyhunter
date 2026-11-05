@@ -21,6 +21,16 @@ class FlakyHunterApplicationTests extends IntegrationTest {
 	}
 
 	@Test
+	void apiDocsArePublic() throws Exception {
+		mvc.perform(get("/api/docs/openapi"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.paths['/api/v1/ingest']").exists());
+		String uiPage = mvc.perform(get("/api/docs")).andExpect(status().is3xxRedirection())
+				.andReturn().getResponse().getRedirectedUrl();
+		mvc.perform(get(uiPage)).andExpect(status().isOk());
+	}
+
+	@Test
 	void otherEndpointsNeedLogin() throws Exception {
 		mvc.perform(get("/api/projects"))
 				.andExpect(status().isUnauthorized())

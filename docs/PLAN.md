@@ -532,7 +532,7 @@ Each phase ends **deployed, tested and demoable**. Sizes: S ≈ 2–3 evenings, 
 > Audit fixes: per-email login limit (S2), strictly ordered per-project processing (B1), full non-SHA commit labels
 > (B2), real build time + deployed commit at `/api/actuator/info`. Tests: 112 backend + 11 frontend, all green.
 
-### Phase 5 — Playwright support, GitHub Action, dogfooding (M)
+### Phase 5 — Playwright support, GitHub Action, dogfooding (M) — live 2026-11-05 (dogfooding pending)
 - [x] Playwright JSON parser (attempt-level retries)
 - [x] Composite GitHub Action `flakyhunter/upload` in `examples/` (or its own repo) with inputs: api-key, files, format
 - [ ] VehicleStore's E2E workflow and FlakyHunter's own CI upload results to the live instance
@@ -544,7 +544,7 @@ Each phase ends **deployed, tested and demoable**. Sizes: S ≈ 2–3 evenings, 
 > `FLAKYHUNTER_API_KEY`** (without it the step only warns). VehicleStore is a separate repository: add the same
 > 4-line step to its workflow (snippet on the Setup page) — **not done yet**.
 
-### Phase 6 — Quarantine, alerts, JUnit 5 extension (M)
+### Phase 6 — Quarantine, alerts, JUnit 5 extension (M) — live 2026-11-05
 - [x] Quarantine with reason/expiry, auto-lift, history; `GET /api/v1/quarantine`
 - [x] Webhooks (Slack/Discord/generic) with HMAC signing and delivery status
 - [x] `junit5-extension` module: `@ExtendWith(FlakyHunterExtension.class)` / auto-registration, caches list per run,
@@ -557,7 +557,7 @@ Each phase ends **deployed, tested and demoable**. Sizes: S ≈ 2–3 evenings, 
 > secret shown once. The extension is published through JitPack (`jitpack.yml`); the "Done when" check in a sample
 > Maven project is described in `junit5-extension/README.md` and still needs a real run. See ADR-0006.
 
-### Phase 7 — Hardening and presentation (S–M)
+### Phase 7 — Hardening and presentation (S–M) — live 2026-11-05 (perf review, screenshots open)
 - [x] Playwright E2E suite + recordings; JaCoCo coverage badge; Swagger UI polished
 - [ ] Performance pass: EXPLAIN on dashboard queries, indexes verified, N+1 checks (Hibernate statistics in tests)
 - [x] README: pitch, live demo, architecture diagram, scoring explanation, screenshots, "hard problems solved"
