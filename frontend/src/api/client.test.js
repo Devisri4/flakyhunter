@@ -1,5 +1,20 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { api, ApiError, readCookie } from './client'
+import { api, ApiError, isServerWaking, readCookie } from './client'
+
+describe('isServerWaking', () => {
+  it('treats proxy errors and "no answer" as a sleeping server', () => {
+    expect(isServerWaking(new ApiError(504, 'Gateway timeout'))).toBe(true)
+    expect(isServerWaking(new ApiError(502, 'Bad gateway'))).toBe(true)
+    expect(isServerWaking(new TypeError('Failed to fetch'))).toBe(true)
+  })
+
+  it('does not keep retrying real errors', () => {
+    expect(isServerWaking(new ApiError(401, 'Login required'))).toBe(false)
+    expect(isServerWaking(new ApiError(404, 'Not found'))).toBe(false)
+    expect(isServerWaking(new ApiError(500, 'Server error'))).toBe(false)
+    expect(isServerWaking(new Error('something else'))).toBe(false)
+  })
+})
 
 describe('readCookie', () => {
   it('finds a cookie among several', () => {

@@ -17,10 +17,23 @@ export function LandingPage() {
   const [lines, setLines] = useState(null)
   const [error, setError] = useState(null)
 
+  // The free backend can need 2–3 minutes to wake, so keep checking every 10 s before showing an error.
   useEffect(() => {
-    fetchHealth()
-      .then((health) => setLines(describeHealth(health)))
-      .catch((e) => setError(e.message))
+    let cancelled = false
+    async function check(attempt) {
+      try {
+        const health = await fetchHealth()
+        if (!cancelled) setLines(describeHealth(health))
+      } catch (e) {
+        if (cancelled) return
+        if (attempt < 18) setTimeout(() => check(attempt + 1), 10_000)
+        else setError(e.message)
+      }
+    }
+    check(1)
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   return (
@@ -95,7 +108,7 @@ export function LandingPage() {
         <div className="status-line">
           <strong>Backend status</strong>
           {error && <span className="down">Could not reach the API: {error}</span>}
-          {!error && !lines && <span className="muted">Waking up the API… (the free server can take up to a minute)</span>}
+          {!error && !lines && <span className="muted">Waking up the API… (the free server can take 2–3 minutes)</span>}
           {lines?.map((line) => (
             <span key={line} className={line.endsWith('UP') ? 'up' : 'down'}>
               {line.endsWith('UP') ? '✅' : '❌'} {line}
