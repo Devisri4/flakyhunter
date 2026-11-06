@@ -13,6 +13,15 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * True when the API looks asleep rather than broken: the free backend sleeps when idle and needs 2–3 minutes
+ * to wake. While waking, the Vercel proxy answers 502/503/504, or fetch() fails with no answer at all (TypeError).
+ */
+export function isServerWaking(error) {
+  if (error instanceof ApiError) return [502, 503, 504].includes(error.status)
+  return error instanceof TypeError
+}
+
 /** Endpoints where a 401 must not trigger a refresh-and-retry. */
 const NO_RETRY = ['/api/auth/refresh', '/api/auth/login', '/api/auth/signup', '/api/auth/logout']
 

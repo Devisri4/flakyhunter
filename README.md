@@ -13,6 +13,8 @@
 
 **[Live demo](https://flakyhunter.vercel.app/p/demo)** · **[API docs](https://flakyhunter.vercel.app/api/docs)** · **[Plan](docs/PLAN.md)**
 
+<sub>The demo runs on a free server that sleeps when idle, so the first load can take 2–3 minutes. The page loads by itself once it wakes.</sub>
+
 </div>
 
 ---

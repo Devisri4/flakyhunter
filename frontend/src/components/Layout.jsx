@@ -1,6 +1,7 @@
 import { Link, Navigate, Outlet, useLocation, useNavigate, useParams } from 'react-router'
 import { useLogout, useMe, useProject } from '../api/hooks'
 import { Skeleton } from './Skeleton'
+import { WakingNotice } from './WakingNotice'
 
 export function Layout() {
   const me = useMe()
@@ -57,7 +58,14 @@ export function ProjectGate() {
   const me = useMe()
   const project = useProject(slug)
   const location = useLocation()
-  if (me.isLoading || project.isLoading) return <Skeleton height={320} />
+  if (me.isLoading || project.isLoading) {
+    return (
+      <>
+        <WakingNotice />
+        <Skeleton height={320} />
+      </>
+    )
+  }
   if (project.error?.status === 401 && !me.data) {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />
   }
